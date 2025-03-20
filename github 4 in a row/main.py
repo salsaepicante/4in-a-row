@@ -24,7 +24,7 @@ class GameMenu:
         self.screen = pygame.display.set_mode((width,height))
 
         #ozadje
-        self.background = pygame.image.load("slike/background.jpg")
+        self.background = pygame.image.load("github 4 in a row/slike/background.jpg")
         self.background = pygame.transform.scale(self.background, (width,height))  # Prilagodi velikost
         #gumbi za izbor načina igre
         self.button1v1 = pygame.Rect((width / 2)-(width*0.3)/2 ,(height / 2)-(height*0.1)/2,width*0.3,height*0.1)
@@ -76,7 +76,7 @@ selected_mode = menu.run()
 pygame.quit()
 
 
-
+print(selected_mode)
 
 
 
