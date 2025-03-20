@@ -76,7 +76,7 @@ selected_mode = menu.run()
 pygame.quit()
 
 
-print(selected_mode)
+
 
 
 
