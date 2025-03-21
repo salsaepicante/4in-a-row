@@ -15,9 +15,9 @@ class Code_1v1:
     def __init__(self):
         pygame.display.set_caption("Connect 4:  1v1")
         self.screen = pygame.display.set_mode((width,height))
-        self.screen.fill(white)
-        self.board = np.zeros((stolpci,vrstice))
-        #self.board= [[0]* rows for i in range(collumn)]
+        #self.screen.fill(white)
+        self.board = np.zeros((vrstice,stolpci))
+        #self.board= [[0]* vrstice for i in range(stolpci)]
         self.game_over = False
         self.turn = 0 # red = 1, yellow = 0
     def drop_piece(self,row,col,piece):
@@ -35,44 +35,78 @@ class Code_1v1:
         #plošča na kateri se igra
         for vrstica in range(vrstice):
             for stolpec in range(1,stolpci +1):
-                    pygame.draw.rect(self.screen,blue,(vrstica * velikost_kvadrata,stolpec * velikost_kvadrata,velikost_kvadrata,velikost_kvadrata))
+                    pygame.draw.rect(self.screen,blue,( * velikost_kvadrata,stolpec * velikost_kvadrata,velikost_kvadrata,velikost_kvadrata))
                     pygame.draw.circle(self.screen,white,(int(vrstica *  velikost_kvadrata + velikost_kvadrata/2), int(stolpec * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
 
     def winig_move(self,piece):
-        #horizontalno
+           
+        # Horizontal check
+        for vrstica in range(vrstice):
+            for stolpec in range(stolpci - 3):
+                if self.board[vrstica][stolpec] == piece and self.board[vrstica][stolpec + 1] == piece and self.board[vrstica][stolpec + 2] == piece and self.board[vrstica][stolpec + 3] == piece:
+                    return True
+    
+        # Vertical check
         for stolpec in range(stolpci):
-             for vrstica in range(vrstice - 3):
-                if self.board[stolpec][vrstica] == piece and self.board[stolpec][vrstica + 1] == piece and self.board[stolpec][vrstica + 2] == piece and self.board[stolpec][vrstica +3 ] == piece:
+            for vrstica in range(vrstice - 3):
+                if self.board[vrstica][stolpec] == piece and self.board[vrstica + 1][stolpec] == piece and self.board[vrstica + 2][stolpec] == piece and self.board[vrstica + 3][stolpec] == piece:
                     return True
-        #vertikalno                           
-        for stolpec in range(stolpci - 3):
-            for vrstica in range(vrstice):
-                if self.board[stolpec][vrstica] == piece and self.board[stolpec + 1][vrstica] == piece and self.board[stolpec + 2][vrstica] == piece and self.board[stolpec + 3][vrstica] == piece:
-                    return True
-        #poševno naprej
+    
+        # Diagonal (positive slope)
         for vrstica in range(vrstice - 3):
             for stolpec in range(stolpci - 3):
-                if self.board[vrstica][stolpec] == piece and self.board[vrstica + 1][stolpec +1] == piece and self.board[vrstica + 2][stolpec + 2] == piece and self.board[vrstica + 3][stolpec + 3] == piece:
+                if self.board[vrstica][stolpec] == piece and self.board[vrstica + 1][stolpec + 1] == piece and self.board[vrstica + 2][stolpec + 2] == piece and self.board[vrstica + 3][stolpec + 3] == piece:
                     return True
-        #poševno nazaj
-        for vrstica in range(vrstice - 3):
-            for stolpec in range(3,stolpci):
-                if self.board[vrstica][stolpec] == piece and self.board[vrstica +1][stolpec -1] == piece and self.board[vrstica +2][stolpec -2] == piece and self.board[vrstica +3][stolpec - 3]:
+    
+        # Diagonal (negative slope)
+        for vrstica in range(3, vrstice):
+            for stolpec in range(stolpci - 3):
+                if self.board[vrstica][stolpec] == piece and self.board[vrstica - 1][stolpec + 1] == piece and self.board[vrstica - 2][stolpec + 2] == piece and self.board[vrstica - 3][stolpec + 3] == piece:
                     return True
+    
         return False
     
     def run_game(self):
         self.draw_board()
+        
         while not self.game_over:
             for event in pygame.event.get():
+                print(self.board)
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            
+                if event.type == pygame.MOUSEMOTION:
+                    posx = event.pos[0]
+                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
+                    pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(event.pos[0],int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))
+                    pygame.display.update()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
+                    posx = event.pos[0]
+                    stolpec = posx// velikost_kvadrata
+                    if self.is_valid_location(stolpec):
+                        vrstica = self.naslednja_prosta_vrstica(stolpec)
+                        self.drop_piece(vrstica,stolpec,1 if self.turn == 0 else 2)
+                        pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2), (vrstica + 1) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))
+
+
+                        if self.winig_move(1 if self.turn == 0 else 2):
+                            font = pygame.font.Font(None, 48)
+                            if self.turn == 0:
+                                label = font.render("Player 1 wins!!", 1, red)
+                            else:
+                                label = font.render("Player 2 wins!!", 1, yellow)
+                            self.screen.blit(label, (40,10))
+                            self.game_over = True
+                    self.turn += 1
+                    self.turn = self.turn % 2
+                    #self.draw_board()
+
+            pygame.display.update()
 
 if __name__ == "__main__":
     RUN = Code_1v1()
-    RUN.draw_board()
+    
     RUN.run_game()
 
 
