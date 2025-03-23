@@ -69,7 +69,7 @@ class Code_1v1:
     
     def run_game(self):
         self.draw_board()
-        
+        myfont = pygame.font.SysFont("monospace", 75)
         while not self.game_over:
             for event in pygame.event.get():
                 print(self.board)
@@ -82,22 +82,25 @@ class Code_1v1:
                     pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(event.pos[0],int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))
                     pygame.display.update()
                 if  event.type == pygame.MOUSEBUTTONDOWN:
-                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                     posx = event.pos[0]
                     stolpec = min(posx // velikost_kvadrata, stolpci - 1) 
                     if 0 <= stolpec < stolpci and self.is_valid_location(stolpec):
                         vrstica = self.naslednja_prosta_vrstica(stolpec)
+                        posx = event.pos[0]
                         self.drop_piece(vrstica,stolpec,1 if self.turn == 0 else 2)
-                        pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice - vrstica - 1) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))
-
-
+                        #pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(ne dela) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))
+                        pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))  
+                       
                         if self.winig_move(1 if self.turn == 0 else 2):
-                            font = pygame.font.Font(None, 48)
                             if self.turn == 0:
-                                label = font.render("Player 1 wins!!", 1, red)
+                                label = myfont.render("Player 1 wins!!", 1, red)
                             else:
-                                label = font.render("Player 2 wins!!", 1, yellow)
+                                label = myfont.render("Player 2 wins!!", 1, yellow)
+                            
+
+                            pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                             self.screen.blit(label, (40,10))
+                            pygame.display.update()
                             pygame.time.wait(10000)
                             self.game_over = True
                     self.turn += 1
