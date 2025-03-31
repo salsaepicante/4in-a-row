@@ -21,6 +21,8 @@ class Code_1v1:
         #self.board= [[0]* stolpci for i in range(vrstice)]
         self.game_over = False
         self.turn = 0 # red = 1, yellow = 0
+        self.reset_picture = pygame.image.load("github 4 in a row/slike/reset.png")
+        self.reset_picture = pygame.transform.scale(self.reset_picture, (100, 100))
         
         # Load sounds and music
         self.load_sounds()
@@ -161,30 +163,54 @@ class Code_1v1:
                             
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                             self.screen.blit(label, (40,10))
-                            pygame.draw.rect(self.screen,"github 4 in a row/slike/reset.png",(self.button_reset))
+                            self.screen.blit(self.reset_picture,(self.button_reset))
                             pygame.display.update()
-                            pygame.time.wait(3000)
-                            pygame.quit()
-                            sys.exit()
                             self.game_over = True
+                            pygame.time.wait(1000)
+                            waiting_for_input = True
+                            while waiting_for_input:
+                                for evt in pygame.event.get():
+                                    if evt.type == pygame.QUIT:
+                                        pygame.quit()
+                                        sys.exit()
+                                    if evt.type == pygame.MOUSEBUTTONDOWN:
+                                        if self.button_reset.collidepoint(evt.pos):
+                                            self.restart_board()
+                                            waiting_for_input = False
+                                            break  # Exit the wait loop and return to the game
+                                        else:
+                                            pygame.quit()
+                                            sys.exit()
+
 
                         if self.izenaceno():
                             label = myfont.render("DRAW!",1,black)
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                            pygame.draw.rect(self.screen,"github 4 in a row/slike/reset.png",(self.button_reset))
+                            self.scree.blit(self.reset_picture,(self.button_reset))
                             self.screen.blit(label, (40,10))
                             pygame.display.update()
-                            pygame.time.wait(3000)
-                            pygame.quit()
-                            sys.exit()
                             self.game_over = True
-                    
-
+                            pygame.time.wait(1000)
+                            waiting_for_input = True
+                            while waiting_for_input:
+                                for evt in pygame.event.get():
+                                    if evt.type == pygame.QUIT:
+                                        pygame.quit()
+                                        sys.exit()
+                                    if evt.type == pygame.MOUSEBUTTONDOWN:
+                                        if self.button_reset.collidepoint(evt.pos):
+                                            self.restart_board()
+                                            waiting_for_input = False
+                                            break  # Exit the wait loop and return to the game
+                                        else:
+                                            pygame.quit()
+                                            sys.exit()
                     self.turn += 1
                     self.turn = self.turn % 2
                     pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,
                                       (stolpec * velikost_kvadrata + int(velikost_kvadrata/2), int(velikost_kvadrata/2)),
                                       int(velikost_kvadrata/2 - 5))
+                        
                     pygame.display.update()
         
                     
