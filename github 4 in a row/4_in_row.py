@@ -30,12 +30,12 @@ class Code_1v1:
     def load_sounds(self):
         try:
             # Load background music - replace 'background_music.mp3' with your music file
-            self.background_music = pygame.mixer.music.load('background_music.mp3')
+            self.background_music = pygame.mixer.music.load("github 4 in a row/sounds/background_music.mp3")
             # Load sound effects - replace these with your sound files
-            self.drop_sound = pygame.mixer.Sound('drop_sound.wav')
-            self.win_sound = pygame.mixer.Sound('win_sound.wav')
-        except:
-            print("Could not load sound files. Make sure they exist in the correct location.")
+            self.drop_sound = pygame.mixer.Sound("github 4 in a row/sounds/drop_sound.wav")
+            self.win_sound = pygame.mixer.Sound("github 4 in a row/sounds/win_sound.wav")
+        except Exception as e:
+            print(f"Could not load sound files. Make sure they exist in the correct location. {e}")
             
     def play_background_music(self):
         try:
@@ -96,13 +96,6 @@ class Code_1v1:
     
         return False
     
-    def izenaceno(self):
-        for i in self.board:
-            for j in i:
-                if j != 1 and j != 2:
-                    return False
-        return True
-
     def restart_board(self):
         self.board = np.zeros((vrstice,stolpci))
         self.game_over = False
@@ -111,10 +104,19 @@ class Code_1v1:
         self.draw_board()
         pygame.display.update()
 
+    def izenaceno(self):
+        for i in self.board:
+            for j in i:
+                if j != 1 and j != 2:
+                    return False
+        return True
+
+
     def run_game(self):
         button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
         myfont = pygame.font.SysFont("monospace", 50)
+        self.button_again = pygame.Rect(width//2-100, height//2, 200, 50)
         while not self.game_over:
             for event in pygame.event.get():
                
@@ -132,10 +134,11 @@ class Code_1v1:
                                       (stolpec * velikost_kvadrata + int(velikost_kvadrata/2), int(velikost_kvadrata/2)),
                                       int(velikost_kvadrata/2 - 5))
                     pygame.display.update()
-                if  event.type == pygame.MOUSEBUTTONDOWN:   
+                if  event.type == pygame.MOUSEBUTTONDOWN: 
+                    
                     posx = event.pos[0]
                     stolpec = min(posx // velikost_kvadrata, stolpci - 1)
-                    #print(stolpec) 
+                    print(stolpec) 
                     if 0 <= stolpec < stolpci and self.is_valid_location(stolpec):
                         vrstica = self.naslednja_prosta_vrstica(stolpec)
                         posx = event.pos[0]
@@ -152,19 +155,17 @@ class Code_1v1:
                                 pass
                                 
                             if self.turn == 0:
-                                label = myfont.render("Red Player 1 wins!!", 1, black)
+                                label = myfont.render("RED Player wins!!", 1, red)
                             else:
-                                label = myfont.render("Yellow Player 2 wins!!", 1, black)
-
+                                label = myfont.render("YELLOW Player wins!!", 1, black)
+                            
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                             self.screen.blit(label, (40,10))
-                            pygame.draw.rect(self.screen,black,button_reset)
-                     
                             pygame.display.update()
                             pygame.time.wait(3000)
                             pygame.quit()
                             sys.exit()
-                            #self.game_over = True
+                            self.game_over = True
 
                         if self.izenaceno():
                             label = myfont.render("DRAW!",1,black)
@@ -174,14 +175,18 @@ class Code_1v1:
                             pygame.time.wait(3000)
                             pygame.quit()
                             sys.exit()
-                            #self.game_over = True
-                        
+                            self.game_over = True
+                    
+
                     self.turn += 1
                     self.turn = self.turn % 2
                     pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,
                                       (stolpec * velikost_kvadrata + int(velikost_kvadrata/2), int(velikost_kvadrata/2)),
                                       int(velikost_kvadrata/2 - 5))
-            pygame.display.update()
+                    pygame.display.update()
+        
+                    
+            
 
 if __name__ == "__main__":
     RUN = Code_1v1()
