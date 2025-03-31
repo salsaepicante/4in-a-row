@@ -113,7 +113,7 @@ class Code_1v1:
 
 
     def run_game(self):
-        button_reset = pygame.Rect(600,0,100,100)
+        self.button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
         myfont = pygame.font.SysFont("monospace", 50)
         self.button_again = pygame.Rect(width//2-100, height//2, 200, 50)
@@ -138,7 +138,7 @@ class Code_1v1:
                     
                     posx = event.pos[0]
                     stolpec = min(posx // velikost_kvadrata, stolpci - 1)
-                    print(stolpec) 
+                    #print(stolpec) 
                     if 0 <= stolpec < stolpci and self.is_valid_location(stolpec):
                         vrstica = self.naslednja_prosta_vrstica(stolpec)
                         posx = event.pos[0]
@@ -161,6 +161,7 @@ class Code_1v1:
                             
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                             self.screen.blit(label, (40,10))
+                            pygame.draw.rect(self.screen,black,(self.button_reset))
                             pygame.display.update()
                             pygame.time.wait(3000)
                             pygame.quit()
@@ -170,6 +171,7 @@ class Code_1v1:
                         if self.izenaceno():
                             label = myfont.render("DRAW!",1,black)
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
+                            pygame.draw.rect(self.screen,black,(self.button_reset))
                             self.screen.blit(label, (40,10))
                             pygame.display.update()
                             pygame.time.wait(3000)

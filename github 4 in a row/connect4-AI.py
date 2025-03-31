@@ -113,10 +113,10 @@ class Code_1v1:
 
 
     def run_game(self):
-        button_reset = pygame.Rect(600,0,100,100)
+        self.button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
         myfont = pygame.font.SysFont("monospace", 50)
-        self.button_again = pygame.Rect(width//2-100, height//2, 200, 50)
+        
         while not self.game_over:
             for event in pygame.event.get():
                
@@ -161,6 +161,7 @@ class Code_1v1:
                             
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                             self.screen.blit(label, (40,10))
+                            pygame.draw.rect(self.screen,black,(self.button_reset))
                             pygame.display.update()
                             pygame.time.wait(3000)
                             pygame.quit()
@@ -171,6 +172,7 @@ class Code_1v1:
                             label = myfont.render("DRAW!",1,black)
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                             self.screen.blit(label, (40,10))
+                            pygame.draw.rect(self.screen,black,(self.button_reset))
                             pygame.display.update()
                             pygame.time.wait(3000)
                             pygame.quit()
