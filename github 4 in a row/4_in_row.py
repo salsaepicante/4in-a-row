@@ -68,7 +68,7 @@ class Code_1v1:
                     pygame.draw.rect(self.screen,blue,(stolpec * velikost_kvadrata,vrstica * velikost_kvadrata,velikost_kvadrata,velikost_kvadrata))
                     pygame.draw.circle(self.screen,white,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
 
-    def wining_move(self,piece):
+    def winig_move(self,piece):
            
         # Horizontal check
         for vrstica in range(vrstice):
@@ -96,28 +96,11 @@ class Code_1v1:
     
         return False
     
-    def izenaceno(self):
-        for i in self.board:
-            for j in i:
-                if j != 1 and j != 2:
-                    return False
-        return True
-
-    def restart_board(self):
-        self.board = np.zeros((vrstice,stolpci))
-        self.game_over = False
-        self.turn = 0
-        self.screen.fill(white)
-        self.draw_board()
-        pygame.display.update()
-
     def run_game(self):
-        button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
         myfont = pygame.font.SysFont("monospace", 50)
         while not self.game_over:
             for event in pygame.event.get():
-               
                 #print(self.board)
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -135,14 +118,14 @@ class Code_1v1:
                 if  event.type == pygame.MOUSEBUTTONDOWN:   
                     posx = event.pos[0]
                     stolpec = min(posx // velikost_kvadrata, stolpci - 1)
-                    #print(stolpec) 
+                    print(stolpec) 
                     if 0 <= stolpec < stolpci and self.is_valid_location(stolpec):
                         vrstica = self.naslednja_prosta_vrstica(stolpec)
                         posx = event.pos[0]
                         self.drop_piece(vrstica,stolpec,1 if self.turn == 0 else 2)
                         pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))  
                        
-                        if self.wining_move(1 if self.turn == 0 else 2):
+                        if self.winig_move(1 if self.turn == 0 else 2):
                             # Play winning sound
                             try:
                                 self.win_sound.play()
@@ -152,35 +135,18 @@ class Code_1v1:
                                 pass
                                 
                             if self.turn == 0:
-                                label = myfont.render("Red Player 1 wins!!", 1, black)
+                                label = myfont.render("Player 1 wins!!", 1, red)
                             else:
-                                label = myfont.render("Yellow Player 2 wins!!", 1, black)
-
-                            pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                            self.screen.blit(label, (40,10))
-                            pygame.draw.rect(self.screen,black,button_reset)
-                     
-                            pygame.display.update()
-                            pygame.time.wait(3000)
-                            pygame.quit()
-                            sys.exit()
-                            #self.game_over = True
-
-                        if self.izenaceno():
-                            label = myfont.render("DRAW!",1,black)
+                                label = myfont.render("Player 2 wins!!", 1, yellow)
+                            
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                             self.screen.blit(label, (40,10))
                             pygame.display.update()
-                            pygame.time.wait(3000)
-                            pygame.quit()
-                            sys.exit()
-                            #self.game_over = True
-                        
+                            pygame.time.wait(10000)
+                            self.game_over = True
                     self.turn += 1
                     self.turn = self.turn % 2
-                    pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,
-                                      (stolpec * velikost_kvadrata + int(velikost_kvadrata/2), int(velikost_kvadrata/2)),
-                                      int(velikost_kvadrata/2 - 5))
+                    
             pygame.display.update()
 
 if __name__ == "__main__":
