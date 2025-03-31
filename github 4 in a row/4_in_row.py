@@ -155,13 +155,13 @@ class Code_1v1:
                                 pass
                                 
                             if self.turn == 0:
-                                label = myfont.render("RED Player wins!!", 1, red)
+                                label = myfont.render("RED Player wins!!", 1, black)
                             else:
                                 label = myfont.render("YELLOW Player wins!!", 1, black)
                             
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                             self.screen.blit(label, (40,10))
-                            pygame.draw.rect(self.screen,black,(self.button_reset))
+                            pygame.draw.rect(self.screen,"github 4 in a row/slike/reset.png",(self.button_reset))
                             pygame.display.update()
                             pygame.time.wait(3000)
                             pygame.quit()
@@ -171,7 +171,7 @@ class Code_1v1:
                         if self.izenaceno():
                             label = myfont.render("DRAW!",1,black)
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                            pygame.draw.rect(self.screen,black,(self.button_reset))
+                            pygame.draw.rect(self.screen,"github 4 in a row/slike/reset.png",(self.button_reset))
                             self.screen.blit(label, (40,10))
                             pygame.display.update()
                             pygame.time.wait(3000)
