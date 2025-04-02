@@ -1,7 +1,7 @@
 import sys
 import pygame
 import numpy as np
-from main import width, height, red, green, black, white,yellow
+from menu import width, height, red, green, black, white,yellow
 
 pygame.init()
 # Initialize the mixer for playing sounds and music
@@ -11,8 +11,11 @@ stolpci = 7  #stolpci
 vrstice = 6 #vrstice
 velikost_kvadrata = 100
 
+turn_AI = 0
+turn_ME = 1
 
-class Code_1v1:
+
+class Code_Ai:
     def __init__(self):
         pygame.display.set_caption("Connect 4:  1v1")
         self.screen = pygame.display.set_mode((width,height))
@@ -216,11 +219,10 @@ class Code_1v1:
                     
             
 
-if __name__ == "__main__":
-    RUN = Code_1v1()
+"""if __name__ == "__main__":
+    RUN = Code_Ai()
     RUN.run_game()
-
-
+"""
 
 
 

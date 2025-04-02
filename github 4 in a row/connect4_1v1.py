@@ -1,7 +1,7 @@
 import sys
 import pygame
 import numpy as np
-from main import width, height, red, green, black, white,yellow
+from menu import width, height, red, green, black, white,yellow
 
 pygame.init()
 # Initialize the mixer for playing sounds and music
@@ -216,9 +216,10 @@ class Code_1v1:
                     
             
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     RUN = Code_1v1()
-    RUN.run_game()
+    RUN.run_game()"""
+
 
 
 

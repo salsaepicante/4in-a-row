@@ -71,7 +71,7 @@ class GameMenu:
             running = self.izberi_mode()
         return self.game_mode
 
-menu = GameMenu()
+"""menu = GameMenu()
 selected_mode = menu.run()
 pygame.quit()
 
@@ -80,4 +80,4 @@ print(selected_mode)
 
 
 
-pygame.quit()
+pygame.quit()"""
