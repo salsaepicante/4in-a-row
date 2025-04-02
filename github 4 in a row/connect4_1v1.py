@@ -105,6 +105,8 @@ class Code_1v1:
         self.screen.fill(white)
         self.draw_board()
         pygame.display.update()
+        # Restart background music
+        self.play_background_music()
 
     def izenaceno(self):
         for i in self.board:
