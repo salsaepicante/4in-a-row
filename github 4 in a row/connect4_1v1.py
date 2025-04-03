@@ -188,7 +188,7 @@ class Code_1v1:
                         if self.izenaceno():
                             label = myfont.render("DRAW!",1,black)
                             pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                            self.scree.blit(self.reset_picture,(self.button_reset))
+                            self.screen.blit(self.reset_picture,(self.button_reset))
                             self.screen.blit(label, (40,10))
                             pygame.display.update()
                             self.game_over = True
@@ -207,8 +207,10 @@ class Code_1v1:
                                         else:
                                             pygame.quit()
                                             sys.exit()
-                    self.turn += 1
-                    self.turn = self.turn % 2
+                        else:
+                            self.turn += 1
+                            self.turn = self.turn % 2
+                    
                     pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,
                                       (stolpec * velikost_kvadrata + int(velikost_kvadrata/2), int(velikost_kvadrata/2)),
                                       int(velikost_kvadrata/2 - 5))

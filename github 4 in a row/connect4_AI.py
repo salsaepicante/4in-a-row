@@ -1,7 +1,8 @@
 import sys
 import pygame
 import numpy as np
-from random import randint
+from random import randint,random
+
 from menu import width, height, red, green, black, white,yellow
 
 pygame.init()
@@ -23,11 +24,12 @@ class Code_Ai:
         self.board = np.zeros((vrstice,stolpci))
         #self.board= [[0]* stolpci for i in range(vrstice)]
         self.game_over = False
-        self.turn = 0 # red = 1, yellow = 0
-        self.reset_picture = pygame.image.load("github 4 in a row/slike/reset.png")
-        self.reset_picture = pygame.transform.scale(self.reset_picture, (100, 100))
         self.turn_AI = 1
         self.turn_ME = 0
+        self.turn = randint(self.turn_ME,self.turn_AI)
+        self.reset_picture = pygame.image.load("github 4 in a row/slike/reset.png")
+        self.reset_picture = pygame.transform.scale(self.reset_picture, (100, 100))
+        self.search_depth = 4
         
         # Load sounds and music
         self.load_sounds()
@@ -122,7 +124,11 @@ class Code_Ai:
                     return False
         return True
 
-
+    def state_of_the_game(self):
+        pass
+    def minimax(self):
+        pass
+    
     def run_game(self):
         self.button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
@@ -147,7 +153,6 @@ class Code_Ai:
                                         int(velikost_kvadrata/2 - 5))
                         pygame.display.update()
                     if  event.type == pygame.MOUSEBUTTONDOWN: 
-                        
                             posx = event.pos[0]
                             stolpec = min(posx // velikost_kvadrata, stolpci - 1)
                             #print(stolpec) 
@@ -156,9 +161,7 @@ class Code_Ai:
                                 posx = event.pos[0]
                                 self.drop_piece(vrstica,stolpec,1)
                                 pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))  
-
-                                self.turn += 1
-                                self.turn = self.turn % 2
+                                self.turn = self.turn_AI
                                 if self.wining_move(1):
                                     # Play winning sound
                                     try:
@@ -220,7 +223,10 @@ class Code_Ai:
                 pygame.display.update()
             if self.turn == self.turn_AI:
                 pygame.time.wait(500)
-                stolpec = randint(0, stolpci - 1)
+                if random() < 0.1:
+                    stolpec = randint(0, stolpci - 1)
+                else:
+                    stolpec = 3
                 while not self.is_valid_location(stolpec):
                     stolpec = randint(0, stolpci - 1)
                     #print(stolpec) 
@@ -229,8 +235,8 @@ class Code_Ai:
                     #posx = event.pos[0]
                     self.drop_piece(vrstica,stolpec,2)
                     pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))
-                    self.turn += 1
-                    self.turn = self.turn % 2
+                    self.turn = self.turn_ME
+                    
                     if self.wining_move(2):
                                     # Play winning sound
                                     try:
