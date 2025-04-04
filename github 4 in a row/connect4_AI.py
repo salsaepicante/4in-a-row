@@ -13,7 +13,60 @@ stolpci = 7  #stolpci
 vrstice = 6 #vrstice
 velikost_kvadrata = 100
 
+class AI_difficulty:
+    def __init__(self):
+        pygame.display.set_caption("Choose AI difficulty")
+        self.screen = pygame.display.set_mode((width,height))
+        self.font = pygame.font.Font(None,50)
+        self.screen = pygame.display.set_mode((width,height))
 
+        #ozadje
+        self.background = pygame.image.load("github 4 in a row/slike/background.jpg")
+        self.background = pygame.transform.scale(self.background, (width,height)) 
+        #gumbi za izbor načina igre
+        self.button_easy = pygame.Rect((width / 2)-(width*0.3)/2 ,(height / 2)-(height*0.1)/2,width*0.3,height*0.1)
+        self.button_hard = pygame.Rect((width / 2)-(width*0.3)/2 ,(height / 2)-(height*0.5)/2,width*0.3,height*0.1)
+        self.game_mode = None  # način igre dam na None
+    
+    #za ozadje
+    def set_background(self):
+        self.screen.blit(self.background,(0,0))
+
+
+    #narišem gumbe in besedilo na zaslon
+    def buttons(self):
+        pygame.draw.rect(self.screen,black,self.button_easy)
+        pygame.draw.rect(self.screen,black,self.button_hard)
+        text_easy = self.font.render("EASY",True,white)
+        text_hard = self.font.render("HARD",True,white)
+
+        self.screen.blit(text_easy, (self.button_easy.x + 10, self.button_easy.y + 30))
+        self.screen.blit(text_hard, (self.button_hard.x + 5, self.button_hard.y + 30))
+    
+
+
+    def izberi_mode(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.button_easy.collidepoint(event.pos):
+                    self.difficulty = "easy"
+                    return False
+                if self.button_hard.collidepoint(event.pos):
+                    self.difficulty = "hard"
+                    return False
+        return True
+
+    def run(self):
+        running = True
+        while running:
+            self.set_background()
+            self.buttons()
+            pygame.display.flip()
+            running = self.izberi_mode()
+        return self.game_mode
 
 
 class Code_Ai:
@@ -124,11 +177,56 @@ class Code_Ai:
                     return False
         return True
 
-    def state_of_the_game(self):
-        pass
-    def minimax(self):
-        pass
+    def state_of_the_game(self,piece):
+        self.score = 0
+        self.center_stolpec = [int(i) for i in list(self.board[:,3])]
+        self.center_stevec = self.center_stolpec.count(piece)
+        self.score += self.center_stevec * 3
+        return self.score
     
+    def minimax(self,depth, alpha, beta, maximizingPlayer):
+        self.valid_locations = [c for c in range(stolpci) if self.is_valid_location(c)]
+        is_terminal = self.wining_move(self.turn_ME) or self.wining_move(self.turn_AI) or self.izenaceno()
+        """if depth == 0 or is_terminal:
+            if is_terminal:
+                if self.wining_move(self.turn_AI):
+                    return (None, 1000000000)
+                elif self.wining_move(self.turn_ME):
+                    return (None, -1000000000)
+                else:
+                    return (None, 0)"""
+        if maximizingPlayer:
+            self.value = -np.inf
+            self.stolpec = self.valid_locations[0]
+            for stolpec in self.valid_locations:
+                vrstica = self.naslednja_prosta_vrstica(stolpec)
+                temp_board = self.board.copy()
+                temp_board[vrstica][stolpci] = self.turn_AI
+                self.new_score = self.state_of_the_game(self.turn_AI)
+                self.new_score += self.state_of_the_game(self.turn_ME)
+                if self.new_score > self.value:
+                    self.value = self.new_score
+                    vrstica = stolpec
+                alpha = max(alpha, self.value)
+                if alpha >= beta:
+                    break
+            return vrstica , self.value
+        else:
+            self.value = np.inf
+            self.stolpec = self.valid_locations[0]
+            for stolpec in self.valid_locations:
+                vrstica = self.naslednja_prosta_vrstica(stolpec)
+                temp_board = self.board.copy()
+                temp_board[vrstica][stolpci] = self.turn_ME
+                self.new_score = self.state_of_the_game(self.turn_ME)
+                self.new_score += self.state_of_the_game(self.turn_AI)
+                if self.new_score < self.value:
+                    self.value = self.new_score
+                    vrstica = stolpec
+                beta = min(beta, self.value)
+                if alpha >= beta:
+                    break
+                return vrstica, self.value
     def run_game(self):
         self.button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
@@ -145,7 +243,7 @@ class Code_Ai:
                 if self.turn == self.turn_ME:
                     if event.type == pygame.MOUSEMOTION:
                         posx = event.pos[0]
-                        # Calculate which column the mouse is over
+                        
                         stolpec = min(posx // velikost_kvadrata, stolpci - 1)
                         pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                         # Draw at the center of the column instead of exact mouse position
@@ -201,7 +299,7 @@ class Code_Ai:
                                 if self.izenaceno():
                                     label = myfont.render("DRAW!",1,black)
                                     pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                                    self.scree.blit(self.reset_picture,(self.button_reset))
+                                    self.screen.blit(self.reset_picture,(self.button_reset))
                                     self.screen.blit(label, (40,10))
                                     pygame.display.update()
                                     self.game_over = True
@@ -223,12 +321,7 @@ class Code_Ai:
                 pygame.display.update()
             if self.turn == self.turn_AI:
                 pygame.time.wait(500)
-                if random() < 0.1:
-                    stolpec = randint(0, stolpci - 1)
-                else:
-                    stolpec = 3
-                while not self.is_valid_location(stolpec):
-                    stolpec = randint(0, stolpci - 1)
+                stolpec = self.minimax(self.search_depth, -np.inf, np.inf, True)[0]
                     #print(stolpec) 
                 if self.is_valid_location(stolpec):
                     vrstica = self.naslednja_prosta_vrstica(stolpec)    
@@ -301,6 +394,8 @@ class Code_Ai:
             
 
 if __name__ == "__main__":
+    difficulty = AI_difficulty()
+    difficulty = difficulty.run()
     RUN = Code_Ai()
     RUN.run_game()
 

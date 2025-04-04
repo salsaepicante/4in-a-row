@@ -148,7 +148,8 @@ class Code_1v1:
                         posx = event.pos[0]
                         self.drop_piece(vrstica,stolpec,1 if self.turn == 0 else 2)
                         pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))  
-                       
+                        pygame.display.update()
+                        pygame.time.wait(300)
                         if self.wining_move(1 if self.turn == 0 else 2):
                             # Play winning sound
                             try:
