@@ -119,10 +119,14 @@ class Code_Ai:
             self.drop_sound.play()
         except:
             pass
-    
+    def drop_piece_for_AI(self,board,row,col,piece):
+        board[row][col] = piece
+        try:
+            self.drop_sound.play()
+        except:
+            pass
+
     def is_valid_location(self,stolpec):
-        if stolpec == None:
-            return 3
         return self.board[vrstice -1][stolpec] == 0
         
 
@@ -189,25 +193,11 @@ class Code_Ai:
     def get_valid_locations(self):
         self.valid_locations = []
         for col in range(stolpci):
-            if self.is_valid_location(self.board, col):
+            if self.is_valid_location( col):
                 self.valid_locations.append(col)
         return self.valid_locations
 
-    def pick_best_move(self,piece):
 
-        self.valid_locations = self.get_valid_locations(self)
-        self.best_score = -10000
-        self.best_col = random.choice(self.valid_locations)
-        for col in self.valid_locations:
-            row = self.naslednja_prosta_vrstica(self,col)
-            temp_board = self.board.copy()
-            self.drop_piece(temp_board, row, col, piece)
-            score = self.state_of_the_game(temp_board, piece)
-            if score > self.best_score:
-                self.best_score = score
-                self.best_col = col
-
-        return self.best_col
 
     def evaluate_window(self,window,piece):
         score = 0
@@ -224,25 +214,29 @@ class Code_Ai:
         if window.count(self.opponent_piece) == 3 and window.count(0) == 1:
             score -= 4
         return score
-    def state_of_the_game(self,piece):
+    def score_position(self,board,piece):
         self.score = 0
         self.center_stolpec = [int(i) for i in list(self.board[:,stolpci//2])]
         self.center_stevec = self.center_stolpec.count(piece)
         self.score += self.center_stevec * 1
+        #horizontalno
         for vrstica in range(vrstice):
             vrstica_array = [int(i) for i in list(self.board[vrstica,:])]
             for stolpec in range(stolpci - 3):
                 window = vrstica_array[stolpec:stolpec + 4]
                 self.score += self.evaluate_window(window, piece)
+        #vertikalno
         for stolpec in range(stolpci):
             stolpec_array = [int(i) for i in list(self.board[:,stolpec])]
             for vrstica in range(vrstice - 3):
                 window = stolpec_array[vrstica:vrstica + 4]
                 self.score += self.evaluate_window(window, piece)
+        #diagonalno
         for vrstica in range(vrstice - 3):
             for stolpec in range(stolpci - 3):
                 window = [self.board[vrstica + i][stolpec + i] for i in range(4)]
                 self.score += self.evaluate_window(window, piece)
+
         for vrstica in range( vrstice - 3):
             for stolpec in range(stolpci - 3):
                 window = [self.board[vrstica +3 - i][stolpec + i] for i in range(4)]
@@ -250,6 +244,22 @@ class Code_Ai:
                 
         return self.score
     
+    def pick_best_move(self,piece):
+
+        self.valid_locations = self.get_valid_locations()
+        self.best_score = -10000
+        self.best_col = random.choice(self.valid_locations)
+        for col in self.valid_locations:
+            row = self.naslednja_prosta_vrstica(col)
+            temp_board = self.board.copy()
+            self.drop_piece_for_AI(temp_board, row, col, piece)
+            self.score = self.score_position(temp_board, piece)
+            if self.score > self.best_score:
+                self.best_score = self.score
+                self.best_col = col
+
+        return self.best_col
+    """
     def minimax(self,depth, alpha, beta, maximizingPlayer):
         self.valid_locations = [c for c in range(stolpci) if self.is_valid_location(c)]
         is_terminal = self.wining_move(self.turn_ME) or self.wining_move(self.turn_AI) or len(self.valid_locations) == 0
@@ -300,7 +310,7 @@ class Code_Ai:
                 beta = min(beta, self.value)
                 if alpha >= beta:
                     break
-            return self.stolpec, self.value
+            return self.stolpec, self.value"""
     def run_game(self):
         self.button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
@@ -391,9 +401,9 @@ class Code_Ai:
                 pygame.display.update()
             if self.turn == self.turn_AI:
                 pygame.time.wait(500)
-                stolpec,rez = self.minimax(self.search_depth, -np.inf, np.inf, True)
+                stolpec = self.pick_best_move(2)
                 
-                print(f"AI chose column {stolpec} with score {rez}")
+                print(f"AI chose column {stolpec} with score ")
                 print(f"Evaluated {len(self.valid_locations)} valid columns")
                     #print(stolpec) 
                 if self.is_valid_location(stolpec):
