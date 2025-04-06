@@ -64,7 +64,7 @@ class AI_difficulty:
         while running:
             self.set_background()
             self.buttons()
-            pygame.display.flip()
+            pygame.display.update()
             running = self.izberi_mode()
         return self.difficulty
 
@@ -175,13 +175,11 @@ class Code_Ai:
     def restart_board(self):
         self.board = np.zeros((vrstice,stolpci))
         self.game_over = False
-        self.turn = 0
+        self.turn = randint(self.turn_ME,self.turn_AI)
         self.screen.fill(white)
         self.draw_board()
         pygame.display.update()
         self.play_background_music()
-
-
 
     def izenaceno(self):
         for i in self.board:
@@ -190,6 +188,15 @@ class Code_Ai:
                     return False
         return True
     
+
+
+    #za AI
+    #
+    #
+    #
+    #
+
+
     def get_valid_locations(self):
         self.valid_locations = []
         for col in range(stolpci):
@@ -207,42 +214,43 @@ class Code_Ai:
         if window.count(piece) == 4:
             score += 100
         elif window.count(piece) == 3 and window.count(0) == 1:
-            score += 5
+            score += 10
         elif window.count(piece) == 2 and window.count(0) == 2:
-            score += 2
+            score += 5
         
         if window.count(self.opponent_piece) == 3 and window.count(0) == 1:
-            score -= 4
+            score -= 80
         return score
+    
     def score_position(self,board,piece):
-        self.score = 0
-        self.center_stolpec = [int(i) for i in list(self.board[:,stolpci//2])]
+        score = 0
+        self.center_stolpec = [int(i) for i in list(board[:,stolpci//2])]
         self.center_stevec = self.center_stolpec.count(piece)
-        self.score += self.center_stevec * 1
+        score += self.center_stevec * 3
         #horizontalno
         for vrstica in range(vrstice):
-            vrstica_array = [int(i) for i in list(self.board[vrstica,:])]
+            vrstica_array = [int(i) for i in list(board[vrstica,:])]
             for stolpec in range(stolpci - 3):
                 window = vrstica_array[stolpec:stolpec + 4]
-                self.score += self.evaluate_window(window, piece)
+                score += self.evaluate_window(window, piece)
         #vertikalno
         for stolpec in range(stolpci):
-            stolpec_array = [int(i) for i in list(self.board[:,stolpec])]
+            stolpec_array = [int(i) for i in list(board[:,stolpec])]
             for vrstica in range(vrstice - 3):
                 window = stolpec_array[vrstica:vrstica + 4]
-                self.score += self.evaluate_window(window, piece)
+                score += self.evaluate_window(window, piece)
         #diagonalno
         for vrstica in range(vrstice - 3):
             for stolpec in range(stolpci - 3):
-                window = [self.board[vrstica + i][stolpec + i] for i in range(4)]
-                self.score += self.evaluate_window(window, piece)
+                window = [board[vrstica + i][stolpec + i] for i in range(4)]
+                score += self.evaluate_window(window, piece)
 
         for vrstica in range( vrstice - 3):
             for stolpec in range(stolpci - 3):
-                window = [self.board[vrstica +3 - i][stolpec + i] for i in range(4)]
-                self.score += self.evaluate_window(window, piece)
+                window = [board[vrstica +3 - i][stolpec + i] for i in range(4)]
+                score += self.evaluate_window(window, piece)
                 
-        return self.score
+        return score
     
     def pick_best_move(self,piece):
 
@@ -259,44 +267,42 @@ class Code_Ai:
                 self.best_col = col
 
         return self.best_col
-    """
+    
     def minimax(self,depth, alpha, beta, maximizingPlayer):
-        self.valid_locations = [c for c in range(stolpci) if self.is_valid_location(c)]
-        is_terminal = self.wining_move(self.turn_ME) or self.wining_move(self.turn_AI) or len(self.valid_locations) == 0
+        self.valid_locations = self.get_valid_locations()
+        self.is_terminal = self.wining_move(self.turn_ME) or self.wining_move(self.turn_AI) or self.izenaceno()
 
-        if depth == 0 or is_terminal:
-            if is_terminal:
-                if self.wining_move(2):
+        if depth == 0 or self.is_terminal:
+            if self.is_terminal:
+                if self.wining_move(self.turn_AI):
                     return (None, 1000000000)
-                elif self.wining_move(1):
+                elif self.wining_move(self.turn_ME):
                     return (None, -1000000000)
                 else:
                     return (None, 0)
             else:
-                return (None, self.state_of_the_game(self.turn_AI) + self.state_of_the_game(self.turn_ME))
+                return (None, self.score_position(self.turn_AI) + self.score_position(self.turn_ME))
     
         if maximizingPlayer:
-            self.value = -np.inf
+            value = -np.inf
             self.stolpec = self.valid_locations[0]
             for stolpec in self.valid_locations:
                 vrstica = self.naslednja_prosta_vrstica(stolpec)
-                if vrstica == -1:
-                    continue
                 board_copy = self.board.copy()
-                board_copy[vrstica][stolpec] = self.turn_AI
+                self.drop_piece_for_AI(board_copy, vrstica, stolpec, self.turn_AI)
                 self.temp_board = self.board.copy()
                 self.temp_board[vrstica][stolpec] = self.turn_AI
                 self.new_score = self.minimax(depth - 1, alpha, beta, False)[1]
                 self.board = self.temp_board.copy()
-                if self.new_score > self.value:
-                    self.value = self.new_score
+                if self.new_score > value:
+                    value = self.new_score
                     self.stolpec = stolpec
                 alpha = max(alpha, self.value)
                 if alpha >= beta:
                     break
-            return self.stolpec , self.value
+            return self.stolpec , value
         else:
-            self.value = np.inf
+            value = np.inf
             self.stolpec = self.valid_locations[0]
             for stolpec in self.valid_locations:
                 vrstica = self.naslednja_prosta_vrstica(stolpec)
@@ -305,12 +311,12 @@ class Code_Ai:
                 self.new_score = self.minimax(depth - 1, alpha, beta, True)[1]
                 self.board = self.temp_board.copy()
                 if self.new_score < self.value:
-                    self.value = self.new_score
+                    value = self.new_score
                     self.stolpec = stolpec
                 beta = min(beta, self.value)
                 if alpha >= beta:
                     break
-            return self.stolpec, self.value"""
+            return self.stolpec, value
     def run_game(self):
         self.button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
@@ -341,7 +347,7 @@ class Code_Ai:
                                 vrstica = self.naslednja_prosta_vrstica(stolpec)
                                 posx = event.pos[0]
                                 self.drop_piece(vrstica,stolpec,1)
-                                pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))  
+                                pygame.draw.circle(self.screen,red,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))  
                                 self.turn = self.turn_AI
                                 if self.wining_move(1):
                                     # Play winning sound
@@ -352,7 +358,7 @@ class Code_Ai:
                                         pass
                                         
                                     
-                                    label = myfont.render("RED Player wins!!", 1, black)
+                                    label = myfont.render("YOU win!!", 1, black)
                                     
                                     pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
                                     self.screen.blit(label, (40,10))
@@ -401,75 +407,72 @@ class Code_Ai:
                 pygame.display.update()
             if self.turn == self.turn_AI:
                 pygame.time.wait(500)
+
+
                 stolpec = self.pick_best_move(2)
                 
                 print(f"AI chose column {stolpec} with score ")
                 print(f"Evaluated {len(self.valid_locations)} valid columns")
                     #print(stolpec) 
-                if self.is_valid_location(stolpec):
-                    if stolpec == None:
-                        stolpec = 3
-                    vrstica = self.naslednja_prosta_vrstica(stolpec)    
+                vrstica = self.naslednja_prosta_vrstica(stolpec)    
 
-                    self.drop_piece(vrstica,stolpec,2)
-                    pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))
-                    self.turn = self.turn_ME
-                    
-                    if self.wining_move(2):
-                                    try:
-                                        self.win_sound.play()
-                                        pygame.mixer.music.stop()
-                                    except:
-                                        pass
-                                    
-                                    label = myfont.render("YELLOW Player wins!!", 1, black)
-                                    
-                                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                                    self.screen.blit(label, (40,10))
-                                    self.screen.blit(self.reset_picture,(self.button_reset))
-                                    pygame.display.update()
-                                    self.game_over = True
-                                    pygame.time.wait(1000)
-                                    waiting_for_input = True
-                                    while waiting_for_input:
-                                        for evt in pygame.event.get():
-                                            if evt.type == pygame.QUIT:
+                self.drop_piece(vrstica,stolpec,2)
+                pygame.draw.circle(self.screen,yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))
+                self.turn = self.turn_ME
+                
+                if self.wining_move(2):
+                                try:
+                                    self.win_sound.play()
+                                    pygame.mixer.music.stop()
+                                except:
+                                    pass
+                                
+                                label = myfont.render("YOU lost!!", 1, black)
+                                
+                                pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
+                                self.screen.blit(label, (40,10))
+                                self.screen.blit(self.reset_picture,(self.button_reset))
+                                pygame.display.update()
+                                self.game_over = True
+                                pygame.time.wait(1000)
+                                waiting_for_input = True
+                                while waiting_for_input:
+                                    for evt in pygame.event.get():
+                                        if evt.type == pygame.QUIT:
+                                            pygame.quit()
+                                            sys.exit()
+                                        if evt.type == pygame.MOUSEBUTTONDOWN:
+                                            if self.button_reset.collidepoint(evt.pos):
+                                                self.restart_board()
+                                                waiting_for_input = False
+                                                break 
+                                            else:
                                                 pygame.quit()
                                                 sys.exit()
-                                            if evt.type == pygame.MOUSEBUTTONDOWN:
-                                                if self.button_reset.collidepoint(evt.pos):
-                                                    self.restart_board()
-                                                    waiting_for_input = False
-                                                    break 
-                                                else:
-                                                    pygame.quit()
-                                                    sys.exit()
 
 
-                    if self.izenaceno():
-                        label = myfont.render("DRAW!",1,black)
-                        pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                        self.screen.blit(self.reset_picture,(self.button_reset))
-                        self.screen.blit(label, (40,10))
-                        pygame.display.update()
-                        self.game_over = True
-                        pygame.time.wait(1000)
-                        waiting_for_input = True
-                        while waiting_for_input:
-                            for evt in pygame.event.get():
-                                if evt.type == pygame.QUIT:
+                if self.izenaceno():
+                    label = myfont.render("DRAW!",1,black)
+                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
+                    self.screen.blit(self.reset_picture,(self.button_reset))
+                    self.screen.blit(label, (40,10))
+                    pygame.display.update()
+                    self.game_over = True
+                    pygame.time.wait(1000)
+                    waiting_for_input = True
+                    while waiting_for_input:
+                        for evt in pygame.event.get():
+                            if evt.type == pygame.QUIT:
+                                pygame.quit()
+                                sys.exit()
+                            if evt.type == pygame.MOUSEBUTTONDOWN:
+                                if self.button_reset.collidepoint(evt.pos):
+                                    self.restart_board()
+                                    waiting_for_input = False
+                                    break
+                                else:
                                     pygame.quit()
                                     sys.exit()
-                                if evt.type == pygame.MOUSEBUTTONDOWN:
-                                    if self.button_reset.collidepoint(evt.pos):
-
-                                        self.restart_board()
-
-                                        waiting_for_input = False
-                                        break
-                                    else:
-                                        pygame.quit()
-                                        sys.exit()
                         
                 pygame.display.update()
     
