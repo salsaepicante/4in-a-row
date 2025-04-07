@@ -33,7 +33,7 @@ class Code_Ai:
         self.turn = randint(self.turn_ME,self.turn_AI)
         self.reset_picture = pygame.image.load("github 4 in a row/slike/reset.png")
         self.reset_picture = pygame.transform.scale(self.reset_picture, (100, 100))
-        self.search_depth = 5
+        self.search_depth = difficulty
         
         self.load_sounds()
         self.play_background_music()
@@ -71,11 +71,9 @@ class Code_Ai:
         return board[vrstice -1][stolpec] == 0
         
 
-    def naslednja_prosta_vrstica(self,stolpec):
-        if stolpec == None:
-            stolpec = 3
+    def naslednja_prosta_vrstica(self,board, stolpec):
         for i in range(vrstice):
-            if self.board[i][stolpec] == 0:
+            if board[i][stolpec] == 0:
                 return i
         return -1
     def draw_board(self):
@@ -85,30 +83,30 @@ class Code_Ai:
                     pygame.draw.rect(self.screen,blue,(stolpec * velikost_kvadrata,vrstica * velikost_kvadrata,velikost_kvadrata,velikost_kvadrata))
                     pygame.draw.circle(self.screen,white,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
         pygame.time.wait(500)
-    def wining_move(self,piece):
+    def wining_move(self,board,piece):
            
         # Horizontalno 
         for vrstica in range(vrstice):
             for stolpec in range(stolpci - 3):
-                if self.board[vrstica][stolpec] == piece and self.board[vrstica][stolpec + 1] == piece and self.board[vrstica][stolpec + 2] == piece and self.board[vrstica][stolpec + 3] == piece:
+                if board[vrstica][stolpec] == piece and board[vrstica][stolpec + 1] == piece and board[vrstica][stolpec + 2] == piece and board[vrstica][stolpec + 3] == piece:
                     return True
     
         # Vertikalno 
         for stolpec in range(stolpci):
             for vrstica in range(vrstice - 3):
-                if self.board[vrstica][stolpec] == piece and self.board[vrstica + 1][stolpec] == piece and self.board[vrstica + 2][stolpec] == piece and self.board[vrstica + 3][stolpec] == piece:
+                if board[vrstica][stolpec] == piece and board[vrstica + 1][stolpec] == piece and board[vrstica + 2][stolpec] == piece and board[vrstica + 3][stolpec] == piece:
                     return True
     
         # Diagonale pozitivna
         for vrstica in range(vrstice - 3):
             for stolpec in range(stolpci - 3):
-                if self.board[vrstica][stolpec] == piece and self.board[vrstica + 1][stolpec + 1] == piece and self.board[vrstica + 2][stolpec + 2] == piece and self.board[vrstica + 3][stolpec + 3] == piece:
+                if board[vrstica][stolpec] == piece and board[vrstica + 1][stolpec + 1] == piece and board[vrstica + 2][stolpec + 2] == piece and board[vrstica + 3][stolpec + 3] == piece:
                     return True
     
         # Diagonale negativna
         for vrstica in range(3, vrstice):
             for stolpec in range(stolpci - 3):
-                if self.board[vrstica][stolpec] == piece and self.board[vrstica - 1][stolpec + 1] == piece and self.board[vrstica - 2][stolpec + 2] == piece and self.board[vrstica - 3][stolpec + 3] == piece:
+                if board[vrstica][stolpec] == piece and board[vrstica - 1][stolpec + 1] == piece and board[vrstica - 2][stolpec + 2] == piece and board[vrstica - 3][stolpec + 3] == piece:
                     return True
     
         return False
@@ -195,11 +193,11 @@ class Code_Ai:
     #not used
     def pick_best_move(self,piece):
 
-        self.valid_locations = self.get_valid_locations()
+        self.valid_locations = self.get_valid_locations(self.board)
         self.best_score = -10000
         self.best_col = random.choice(self.valid_locations)
         for col in self.valid_locations:
-            row = self.naslednja_prosta_vrstica(col)
+            row = self.naslednja_prosta_vrstica(self.board,col)
             temp_board = self.board.copy()
             self.drop_piece_for_AI(temp_board, row, col, piece)
             self.score = self.score_position(temp_board, piece)
@@ -209,53 +207,55 @@ class Code_Ai:
 
         return self.best_col
     
+    def is_terminal_node(self,board):
+	    return self.wining_move(board, self.turn_ME) or self.wining_move(board, self.turn_AI) or len(self.get_valid_locations(board)) == 0
 
-
-    def minimax(self,board,depth, alpha, beta, maximizingPlayer):
-        self.valid_locations = self.get_valid_locations(board)
-        self.is_terminal = self.wining_move(self.turn_ME) or self.wining_move(self.turn_AI) or self.izenaceno()
-
-        if depth == 0 or self.is_terminal:
-            if self.is_terminal:
-                if self.wining_move(self.turn_AI):
-                    return (None, 1000000000)
-                elif self.wining_move(self.turn_ME):    
-                    return (None, -1000000000)
-                else:
+    def minimax(self,board, depth, alpha, beta, maximizingPlayer):
+        valid_locations = self.get_valid_locations(board)
+        is_terminal = self.is_terminal_node(board)
+        if depth == 0 or is_terminal:
+            if is_terminal:
+                if self.wining_move(board, self.turn_AI):
+                    return (None, 100000000000000)
+                elif self.wining_move(board, self.turn_ME):
+                    return (None, -10000000000000)
+                else: # Game is over, no more valid moves
                     return (None, 0)
-            else:
-                return (None, self.score_position(board,self.turn_AI))
-    
+            else: # Depth is zero
+                return (None, self.score_position(board, self.turn_AI))
         if maximizingPlayer:
             value = -np.inf
-            return_stolpec = random.choice(self.valid_locations)
-            for stolpec in self.valid_locations:
-                vrstica = self.naslednja_prosta_vrstica(stolpec)
-                board_copy = board.copy()
-                self.drop_piece_for_AI(board_copy, vrstica, stolpec, self.turn_AI)
-                self.new_score = self.minimax(board_copy,depth - 1, alpha, beta, False)[1]
-                if self.new_score > value:
-                    value = self.new_score
-                    return_stolpec = stolpec
-                alpha = max(alpha,value)
+            column = random.choice(valid_locations)
+            for col in valid_locations:
+                row = self.naslednja_prosta_vrstica(board, col)
+                b_copy = board.copy()
+                self.drop_piece_for_AI(b_copy, row, col, self.turn_AI)
+                new_score = self.minimax(b_copy, depth-1, alpha, beta, False)[1]
+                if new_score > value:
+                    value = new_score
+                    column = col
+                alpha = max(alpha, value)
                 if alpha >= beta:
                     break
-            return return_stolpec , value
-        else:
+            return column, value
+
+        else: # Minimizing player
             value = np.inf
-            return_stolpec = random.choice(self.valid_locations)
-            for stolpec in self.valid_locations:
-                vrstica = self.naslednja_prosta_vrstica(stolpec)
-                temp_board = board.copy()
-                self.drop_piece_for_AI(temp_board, vrstica, stolpec, self.turn_ME)
-                self.new_score = self.minimax(temp_board, depth - 1, alpha, beta, True)[1]
-                if self.new_score < value:
-                    value = self.new_score
-                    return_stolpec = stolpec
-                beta = min(beta,value)
+            column = random.choice(valid_locations)
+            for col in valid_locations:
+                row = self.naslednja_prosta_vrstica(board, col)
+                b_copy = board.copy()
+                self.drop_piece_for_AI(b_copy, row, col, self.turn_ME)
+                new_score = self.minimax(b_copy, depth-1, alpha, beta, True)[1]
+                if new_score < value:
+                    value = new_score
+                    column = col
+                beta = min(beta, value)
                 if alpha >= beta:
                     break
-            return return_stolpec, value
+            return column, value
+
+
     def run_game(self):
         self.button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
@@ -283,12 +283,12 @@ class Code_Ai:
                             stolpec = min(posx // velikost_kvadrata, stolpci - 1)
                             #print(stolpec) 
                             if 0 <= stolpec < stolpci and self.is_valid_location(self.board,stolpec):
-                                vrstica = self.naslednja_prosta_vrstica(stolpec)
+                                vrstica = self.naslednja_prosta_vrstica(self.board,stolpec)
                                 posx = event.pos[0]
                                 self.drop_piece(vrstica,stolpec,1)
                                 pygame.draw.circle(self.screen,red,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))  
                                 self.turn = self.turn_AI
-                                if self.wining_move(1):
+                                if self.wining_move(self.board,self.turn_ME):
                                     # Play winning sound
                                     try:
                                         self.win_sound.play()
@@ -347,23 +347,22 @@ class Code_Ai:
             if self.turn == self.turn_AI:
                 pygame.time.wait(500)
 
+                if self.search_depth == 5:
+                    stolpec,tocke = self.minimax(self.board,self.search_depth, -np.inf, np.inf, True)
+                    print(f"AI chose column {stolpec} with score {tocke}")
+                elif self.search_depth == 2:
+                    stolpec = self.pick_best_move(self.turn_AI)
 
-                stolpec,tocke = self.minimax(self.board,self.search_depth, -np.inf, np.inf, True)
-
-                
-                print(f"AI chose column {stolpec} with score {tocke}")
-                print(f"Evaluated {len(self.valid_locations)} valid columns")
                     #print(stolpec) 
 
-
                 if self.is_valid_location(self.board,stolpec):
-                    vrstica = self.naslednja_prosta_vrstica(stolpec)    
+                    vrstica = self.naslednja_prosta_vrstica(self.board, stolpec)    
 
                     self.drop_piece(vrstica,stolpec,self.turn_AI)
                     pygame.draw.circle(self.screen,yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))
                     self.turn = self.turn_ME
                     
-                    if self.wining_move(2):
+                    if self.wining_move(self.board,self.turn_AI):
                                     try:
                                         self.win_sound.play()
                                         pygame.mixer.music.stop()
@@ -420,8 +419,8 @@ class Code_Ai:
                 pygame.display.update()
     
                                
-
+"""
 if __name__ == "__main__":
     RUN = Code_Ai(difficulty)
-    RUN.run_game()
+    RUN.run_game()"""
 
