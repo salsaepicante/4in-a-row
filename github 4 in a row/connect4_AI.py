@@ -43,6 +43,7 @@ class Code_Ai:
             self.background_music = pygame.mixer.music.load("github 4 in a row/sounds/background_music.mp3")
             self.drop_sound = pygame.mixer.Sound("github 4 in a row/sounds/drop_sound.wav")
             self.win_sound = pygame.mixer.Sound("github 4 in a row/sounds/win_sound.wav")
+            self.lose_sound = pygame.mixer.Sound("github 4 in a row/sounds/losing_sound.wav")
         except Exception as e:
             print(f"Could not load sound files. Make sure they exist in the correct location. {e}")
             
@@ -207,9 +208,9 @@ class Code_Ai:
 
         return self.best_col
     
-    def is_terminal_node(self,board):
-	    return self.wining_move(board, self.turn_ME) or self.wining_move(board, self.turn_AI) or len(self.get_valid_locations(board)) == 0
-
+    def is_terminal_node(self, board):
+        return self.wining_move(board, self.turn_ME) or self.wining_move(board, self.turn_AI) or len(self.get_valid_locations(board)) == 0
+    
     def minimax(self,board, depth, alpha, beta, maximizingPlayer):
         valid_locations = self.get_valid_locations(board)
         is_terminal = self.is_terminal_node(board)
@@ -259,7 +260,7 @@ class Code_Ai:
     def run_game(self):
         self.button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
-        myfont = pygame.font.SysFont("monospace", 50)
+        myfont = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf", 40)
         self.button_again = pygame.Rect(width//2-100, height//2, 200, 50)
         stolpec = 0
         while not self.game_over:
@@ -363,34 +364,32 @@ class Code_Ai:
                     self.turn = self.turn_ME
                     
                     if self.wining_move(self.board,self.turn_AI):
-                                    try:
-                                        self.win_sound.play()
-                                        pygame.mixer.music.stop()
-                                    except:
-                                        pass
-                                    
-                                    label = myfont.render("YOU lost!!", 1, black)
-                                    
-                                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                                    self.screen.blit(label, (40,10))
-                                    self.screen.blit(self.reset_picture,(self.button_reset))
-                                    pygame.display.update()
-                                    self.game_over = True
-                                    pygame.time.wait(1000)
-                                    waiting_for_input = True
-                                    while waiting_for_input:
-                                        for evt in pygame.event.get():
-                                            if evt.type == pygame.QUIT:
-                                                pygame.quit()
-                                                sys.exit()
-                                            if evt.type == pygame.MOUSEBUTTONDOWN:
-                                                if self.button_reset.collidepoint(evt.pos):
-                                                    self.restart_board()
-                                                    waiting_for_input = False
-                                                    break 
-                                                else:
-                                                    pygame.quit()
-                                                    sys.exit()
+                        
+                        self.lose_sound.play()
+                        pygame.mixer.music.stop()
+                        
+                        label = myfont.render("YOU lost!!", 1, black)
+                        
+                        pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
+                        self.screen.blit(label, (40,10))
+                        self.screen.blit(self.reset_picture,(self.button_reset))
+                        pygame.display.update()
+                        self.game_over = True
+                        pygame.time.wait(1000)
+                        waiting_for_input = True
+                        while waiting_for_input:
+                            for evt in pygame.event.get():
+                                if evt.type == pygame.QUIT:
+                                    pygame.quit()
+                                    sys.exit()
+                                if evt.type == pygame.MOUSEBUTTONDOWN:
+                                    if self.button_reset.collidepoint(evt.pos):
+                                        self.restart_board()
+                                        waiting_for_input = False
+                                        break 
+                                    else:
+                                        pygame.quit()
+                                        sys.exit()
 
 
                     if self.izenaceno():

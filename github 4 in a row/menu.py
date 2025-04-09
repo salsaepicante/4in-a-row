@@ -20,15 +20,17 @@ height, width = 700, 700
 class GameMenu:
     def __init__(self):
         pygame.display.set_caption("chose a game mode")
-        self.font = pygame.font.Font(None,50)
+        self.font = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf",30)
         self.screen = pygame.display.set_mode((width,height))
 
         #ozadje
+        self.connect4_title = pygame.image.load("github 4 in a row/slike/title_4.gif")
         self.background = pygame.image.load("github 4 in a row/slike/background.jpg")
         self.background = pygame.transform.scale(self.background, (width,height))  # Prilagodi velikost
         #gumbi za izbor načina igre
-        self.button1v1 = pygame.Rect((width / 2)-(width*0.3)/2 ,(height / 2)-(height*0.1)/2,width*0.3,height*0.1)
-        self.buttonAi = pygame.Rect((width / 2)-(width*0.3)/2 ,(height / 2)-(height*0.5)/2,width*0.3,height*0.1)
+        self.button1v1 = pygame.Rect((width / 2)-(width*0.35)/2 ,(height / 2)-(height*0.05)/2,width*0.4,height*0.1)
+        self.buttonAi = pygame.Rect((width / 2)-(width*0.35)/2 ,(height / 2)-(height*0.3)/2,width*0.4,height*0.1)
+        #self.buttonAi = pygame.Rect()
         self.game_mode = None  # način igre dam na None
     
     #za ozadje
@@ -38,13 +40,14 @@ class GameMenu:
 
     #narišem gumbe in besedilo na zaslon
     def buttons(self):
-        pygame.draw.rect(self.screen,black,self.button1v1)
-        pygame.draw.rect(self.screen,black,self.buttonAi)
-        text_1v1 = self.font.render("2 players",True,white)
-        text_Ai = self.font.render("versus Ai",True,white)
-
-        self.screen.blit(text_1v1, (self.button1v1.x + 10, self.button1v1.y + 30))
-        self.screen.blit(text_Ai, (self.buttonAi.x + 5, self.buttonAi.y + 30))
+        
+        #pygame.draw.rect(self.screen,black,self.button1v1)
+        #pygame.draw.rect(self.screen,black,self.buttonAi)
+        self.text_1v1 = self.font.render("2 players",True,white)
+        self.text_Ai = self.font.render("Versus Ai",True,white)
+        self.screen.blit(self.connect4_title,(width/2 - self.connect4_title.get_width()/2, 50))
+        self.screen.blit(self.text_1v1, (self.button1v1.x , self.button1v1.y  + 15))
+        self.screen.blit(self.text_Ai, (self.buttonAi.x , self.buttonAi.y  + 15))
     
 
 

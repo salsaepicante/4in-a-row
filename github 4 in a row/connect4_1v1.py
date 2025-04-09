@@ -112,7 +112,7 @@ class Code_1v1:
     def run_game(self):
         self.button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
-        myfont = pygame.font.SysFont("monospace", 50)
+        myfont = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf", 30)
         self.button_again = pygame.Rect(width//2-100, height//2, 200, 50)
         while not self.game_over:
             for event in pygame.event.get():

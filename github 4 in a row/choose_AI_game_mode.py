@@ -7,15 +7,15 @@ class AI_difficulty:
     def __init__(self):
         pygame.display.set_caption("Choose AI difficulty")
         self.screen = pygame.display.set_mode((width,height))
-        self.font = pygame.font.Font(None,50)
+        self.font = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf",30)
         self.screen = pygame.display.set_mode((width,height))
 
         #ozadje
         self.background = pygame.image.load("github 4 in a row/slike/background.jpg")
         self.background = pygame.transform.scale(self.background, (width,height)) 
         #gumbi za izbor načina igre
-        self.button_easy = pygame.Rect((width / 2)-(width*0.3)/2 ,(height / 2)-(height*0.1)/2,width*0.3,height*0.1)
-        self.button_hard = pygame.Rect((width / 2)-(width*0.3)/2 ,(height / 2)-(height*0.5)/2,width*0.3,height*0.1)
+        self.button_easy = pygame.Rect((width)-(width*0.75) ,(height / 2)-(height*0.3)/2,width*0.2,height*0.1)
+        self.button_hard = pygame.Rect((width)-(width*0.45) ,(height / 2)-(height*0.3)/2,width*0.2,height*0.1)
         self.game_mode = None  # način igre dam na None
     
     #za ozadje
@@ -25,13 +25,15 @@ class AI_difficulty:
 
     #narišem gumbe in besedilo na zaslon
     def buttons(self):
-        pygame.draw.rect(self.screen,black,self.button_easy)
-        pygame.draw.rect(self.screen,black,self.button_hard)
-        text_easy = self.font.render("EASY",True,white)
-        text_hard = self.font.render("HARD",True,white)
+        #pygame.draw.rect(self.screen,black,self.button_easy)
+        #pygame.draw.rect(self.screen,black,self.button_hard)
+        self.text_easy = self.font.render("EASY",True,green)
+        self.text_hard = self.font.render("HARD",True,red)
+        self.text_choose = self.font.render("Choose AI difficulty",True,white)
 
-        self.screen.blit(text_easy, (self.button_easy.x + 10, self.button_easy.y + 30))
-        self.screen.blit(text_hard, (self.button_hard.x + 5, self.button_hard.y + 30))
+        self.screen.blit(self.text_choose, (width/2 - self.text_choose.get_width()/2, 60))
+        self.screen.blit(self.text_easy, (self.button_easy.x + 5, self.button_easy.y  + 15))
+        self.screen.blit(self.text_hard, (self.button_hard.x + 5, self.button_hard.y + 15))
     
 
 
