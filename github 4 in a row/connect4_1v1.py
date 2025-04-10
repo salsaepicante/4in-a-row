@@ -109,6 +109,50 @@ class Code_1v1:
         return True
 
 
+    def escape_menu(self):
+        self.overlay = pygame.Surface((width, height))
+        self.overlay.fill((0, 0, 0))  # Black overlay
+        self.overlay.set_alpha(70)  # 0-255 (higher = darker)
+        self.screen.blit(self.overlay, (0, 0))
+
+        resume_button = pygame.Rect(width//2 - 200, height//2 - 50, 400, 60)
+        menu_button = pygame.Rect(width//2 - 200, height//2 + 50, 400, 60)
+        
+        font = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf", 30)
+        resume_text = font.render("RESUME GAME", True, white)
+        quit_text = font.render("QUIT TO MENU", True, white)
+        pygame.draw.rect(self.screen, black, resume_button, border_radius=10)
+        pygame.draw.rect(self.screen, black, menu_button, border_radius=10)
+        self.screen.blit(resume_text, (resume_button.x + (resume_button.width - resume_text.get_width())//2,
+                                resume_button.y + (resume_button.height - resume_text.get_height())//2))
+        self.screen.blit(quit_text, (menu_button.x + (menu_button.width - quit_text.get_width())//2, 
+                            menu_button.y + (menu_button.height - quit_text.get_height())//2))
+        
+        pygame.display.update()
+        waiting_for_input = True
+        while waiting_for_input:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if resume_button.collidepoint(event.pos):
+                        waiting_for_input = False
+                        self.screen.fill(white)
+                        self.draw_board()
+                        for i in range(vrstice):
+                            for j in range(stolpci):
+                                if self.board[i][j] == 1:
+                                    pygame.draw.circle(self.screen, red, (j * velikost_kvadrata + int(velikost_kvadrata/2), (vrstice - i) * velikost_kvadrata + int(velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
+                                elif self.board[i][j] == 2:
+                                    pygame.draw.circle(self.screen, yellow, (j * velikost_kvadrata + int(velikost_kvadrata/2), (vrstice - i) * velikost_kvadrata + int(velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
+                        pygame.display.update()
+                    elif menu_button.collidepoint(event.pos):
+                        return "menu" 
+                    
+    
+
+
     def run_game(self):
         self.button_reset = pygame.Rect(600,0,100,100)
         self.draw_board()
@@ -119,6 +163,10 @@ class Code_1v1:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    esc = self.escape_menu()
+                    if esc == "menu":
+                        return "menu"
                 if event.type == pygame.MOUSEMOTION:
                     posx = event.pos[0]
                     stolpec = min(posx // velikost_kvadrata, stolpci - 1)
@@ -136,6 +184,7 @@ class Code_1v1:
                         vrstica = self.naslednja_prosta_vrstica(stolpec)
                         posx = event.pos[0]
                         self.drop_piece(vrstica,stolpec,1 if self.turn == 0 else 2)
+                        
                         pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))  
                         pygame.display.update()
                         pygame.time.wait(300)
@@ -169,8 +218,7 @@ class Code_1v1:
                                             waiting_for_input = False
                                             break
                                         else:
-                                            pygame.quit()
-                                            sys.exit()
+                                            return "menu"
 
 
                         if self.izenaceno():
@@ -193,8 +241,7 @@ class Code_1v1:
                                             waiting_for_input = False
                                             break 
                                         else:
-                                            pygame.quit()
-                                            sys.exit()
+                                            return "menu"
                         else:
                             self.turn += 1
                             self.turn = self.turn % 2
@@ -208,9 +255,9 @@ class Code_1v1:
                     
             
 
-"""if __name__ == "__main__":
+if __name__ == "__main__":
     RUN = Code_1v1()
-    RUN.run_game()"""
+    RUN.run_game()
 
 
 
