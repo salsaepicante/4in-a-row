@@ -32,6 +32,7 @@ class Code_1v1:
             self.background_music = pygame.mixer.music.load("github 4 in a row/sounds/background_music.mp3")
             self.drop_sound = pygame.mixer.Sound("github 4 in a row/sounds/drop_sound.wav")
             self.win_sound = pygame.mixer.Sound("github 4 in a row/sounds/win_sound.wav")
+            self.draw_sound = pygame.mixer.Sound("github 4 in a row/sounds/losing_sound.wav")
         except Exception as e:
             print(f"Could not load sound files. Make sure they exist in the correct location. {e}")
             
@@ -150,7 +151,52 @@ class Code_1v1:
                     elif menu_button.collidepoint(event.pos):
                         return "menu" 
                     
-    
+    def menu_endgame(self):
+        self.overlay = pygame.Surface((width, height))
+        self.overlay.fill((0, 0, 0)) 
+        self.overlay.set_alpha(150)  
+        self.screen.blit(self.overlay, (0, 0))
+        draw = False
+        restart_game_button = pygame.Rect(width//2 - 200, height//2 - 50, 400, 60)
+        menu_button = pygame.Rect(width//2 - 200, height//2 + 50, 400, 60)
+        win_button = pygame.image.load("github 4 in a row/slike/win_image.jpg")
+        win_button = pygame.transform.scale(win_button,(width,100))
+        font = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf", 30)
+        resume_text = font.render("RESTART GAME", True, white)
+        quit_text = font.render("QUIT TO MENU", True, white)
+        if self.wining_move(2):
+            win_text = font.render("RED PLAYER WINS",True, red)
+        elif self.wining_move(1):
+            win_text = font.render("YELLOW PLAYER WINS", True, yellow)
+        else:
+            win_text = font.render("DRAW",True,black)
+            draw = True
+        pygame.draw.rect(self.screen, black, restart_game_button, border_radius=10)
+        pygame.draw.rect(self.screen, black, menu_button, border_radius=10)
+        #self.screen.blit(win_button, (0,0))
+        if draw:
+            self.screen.blit(win_text,(275,30))
+        else:
+            self.screen.blit(win_text,(100,30) )
+        self.screen.blit(resume_text, (restart_game_button.x + (restart_game_button.width - resume_text.get_width())//2,
+                                restart_game_button.y + (restart_game_button.height - resume_text.get_height())//2))
+        self.screen.blit(quit_text, (menu_button.x + (menu_button.width - quit_text.get_width())//2, 
+                            menu_button.y + (menu_button.height - quit_text.get_height())//2))
+        
+        pygame.display.update()
+        waiting_for_input = True
+        while waiting_for_input:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if restart_game_button.collidepoint(event.pos):
+                        waiting_for_input = False
+                        self.restart_board()
+                    elif menu_button.collidepoint(event.pos):
+                        return "menu" 
+                    
 
 
     def run_game(self):
@@ -195,53 +241,22 @@ class Code_1v1:
                             except:
                                 pass
                                 
-                            if self.turn == 0:
-                                label = myfont.render("RED Player wins!!", 1, black)
-                            else:
-                                label = myfont.render("YELLOW Player wins!!", 1, black)
-                            
-                            pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                            self.screen.blit(label, (40,10))
-                            self.screen.blit(self.reset_picture,(self.button_reset))
-                            pygame.display.update()
-                            self.game_over = True
-                            pygame.time.wait(1000)
-                            waiting_for_input = True
-                            while waiting_for_input:
-                                for evt in pygame.event.get():
-                                    if evt.type == pygame.QUIT:
-                                        pygame.quit()
-                                        sys.exit()
-                                    if evt.type == pygame.MOUSEBUTTONDOWN:
-                                        if self.button_reset.collidepoint(evt.pos):
-                                            self.restart_board()
-                                            waiting_for_input = False
-                                            break
-                                        else:
-                                            return "menu"
+                            end = self.menu_endgame()
+                            if end == "menu":
+                                return "menu"
+
 
 
                         if self.izenaceno():
-                            label = myfont.render("DRAW!",1,black)
-                            pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                            self.screen.blit(self.reset_picture,(self.button_reset))
-                            self.screen.blit(label, (40,10))
-                            pygame.display.update()
-                            self.game_over = True
-                            pygame.time.wait(1000)
-                            waiting_for_input = True
-                            while waiting_for_input:
-                                for evt in pygame.event.get():
-                                    if evt.type == pygame.QUIT:
-                                        pygame.quit()
-                                        sys.exit()
-                                    if evt.type == pygame.MOUSEBUTTONDOWN:
-                                        if self.button_reset.collidepoint(evt.pos):
-                                            self.restart_board()
-                                            waiting_for_input = False
-                                            break 
-                                        else:
-                                            return "menu"
+                            try:
+                                self.draw_sound.play()
+                                pygame.mixer.music.stop()
+                            except:
+                                pass
+
+                            end = self.menu_endgame()
+                            if end == "menu":
+                                return "menu"
                         else:
                             self.turn += 1
                             self.turn = self.turn % 2
