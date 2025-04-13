@@ -3,7 +3,6 @@ import pygame
 import numpy as np
 from random import randint,random
 import random
-
 from menu import width, height, red, green, black, white,yellow
 
 pygame.init()
@@ -13,13 +12,8 @@ stolpci = 7  #stolpci
 vrstice = 6 #vrstice
 velikost_kvadrata = 100
 
-
-
 difficulty = None
-#
-#AI code
-#class
-#
+
 class Code_Ai:
     def __init__(self,difficulty):
         pygame.display.set_caption("Connect 4:  AI")
@@ -149,7 +143,7 @@ class Code_Ai:
         if piece == self.turn_ME:
             self.opponent_piece = self.turn_AI
         if window.count(piece) == 4:
-            score += 100
+            score += 200
         elif window.count(piece) == 3 and window.count(0) == 1:
             score += 5
         elif window.count(piece) == 2 and window.count(0) == 2:
@@ -262,12 +256,18 @@ class Code_Ai:
 
         resume_button = pygame.Rect(width//2 - 200, height//2 - 50, 400, 60)
         menu_button = pygame.Rect(width//2 - 200, height//2 + 50, 400, 60)
+        restart_button = pygame.Rect(width//2 - 200, height//2 + 150, 400, 60)
         
         font = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf", 30)
         resume_text = font.render("RESUME GAME", True, white)
         quit_text = font.render("QUIT TO MENU", True, white)
+        restart_text = font.render("RESTART GAME", True, white)
+
+        pygame.draw.rect(self.screen, black, restart_button, border_radius=10)
         pygame.draw.rect(self.screen, black, resume_button, border_radius=10)
         pygame.draw.rect(self.screen, black, menu_button, border_radius=10)
+        self.screen.blit(restart_text, (restart_button.x + (restart_button.width - restart_text.get_width())//2,
+                                restart_button.y + (restart_button.height - restart_text.get_height())//2))
         self.screen.blit(resume_text, (resume_button.x + (resume_button.width - resume_text.get_width())//2,
                                 resume_button.y + (resume_button.height - resume_text.get_height())//2))
         self.screen.blit(quit_text, (menu_button.x + (menu_button.width - quit_text.get_width())//2, 
@@ -281,6 +281,9 @@ class Code_Ai:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    if restart_button.collidepoint(event.pos):
+                        waiting_for_input = False
+                        self.restart_board()
                     if resume_button.collidepoint(event.pos):
                         waiting_for_input = False
                         self.screen.fill(white)
@@ -360,15 +363,15 @@ class Code_Ai:
                     esc = self.escape_menu()
                     if esc == "menu":
                         return "menu"
+                if event.type == pygame.MOUSEMOTION:
+                    posx = event.pos[0]
+                    
+                    stolpec = min(posx // velikost_kvadrata, stolpci - 1)
+                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
+                    pygame.draw.circle(self.screen,red,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2), int(velikost_kvadrata/2)),
+                                    int(velikost_kvadrata/2 - 5))
+                    pygame.display.update()
                 if self.turn == self.turn_ME:
-                    if event.type == pygame.MOUSEMOTION:
-                        posx = event.pos[0]
-                        
-                        stolpec = min(posx // velikost_kvadrata, stolpci - 1)
-                        pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                        pygame.draw.circle(self.screen,red,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2), int(velikost_kvadrata/2)),
-                                        int(velikost_kvadrata/2 - 5))
-                        pygame.display.update()
                     if  event.type == pygame.MOUSEBUTTONDOWN: 
                             posx = event.pos[0]
                             stolpec = min(posx // velikost_kvadrata, stolpci - 1)
@@ -388,54 +391,8 @@ class Code_Ai:
                                         pass
                                     end = self.menu_endgame()
                                     if end == "menu":
-                                        return "menu"    
-                                    
-                                    """label = myfont.render("YOU win!!", 1, black)
-                                    
-                                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                                    self.screen.blit(label, (40,10))
-                                    self.screen.blit(self.reset_picture,(self.button_reset))
-                                    pygame.display.update()
-                                    self.game_over = True
-                                    pygame.time.wait(1000)
-                                    waiting_for_input = True
-                                    while waiting_for_input:
-                                        for evt in pygame.event.get():
-                                            if evt.type == pygame.QUIT:
-                                                pygame.quit()
-                                                sys.exit()
-                                            if evt.type == pygame.MOUSEBUTTONDOWN:
-                                                if self.button_reset.collidepoint(evt.pos):
-                                                    self.restart_board()
-                                                    waiting_for_input = False
-                                                    break 
-                                                else:
-                                                    return "menu"
-                                                    """
-
-
-                                if self.izenaceno():
-                                    """label = myfont.render("DRAW!",1,black)
-                                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                                    self.screen.blit(self.reset_picture,(self.button_reset))
-                                    self.screen.blit(label, (40,10))
-                                    pygame.display.update()
-                                    self.game_over = True
-                                    pygame.time.wait(1000)
-                                    waiting_for_input = True
-                                    while waiting_for_input:
-                                        for evt in pygame.event.get():
-                                            if evt.type == pygame.QUIT:
-                                                pygame.quit()
-                                                sys.exit()
-                                            if evt.type == pygame.MOUSEBUTTONDOWN:
-                                                if self.button_reset.collidepoint(evt.pos):
-                                                    self.restart_board()
-                                                    waiting_for_input = False
-                                                    break  
-                                                else:
-                                                    return "menu"
-                                                    """
+                                        return "menu"   
+                                if self.izenaceno():	
                                     end = self.menu_endgame()
                                     if end == "menu":
                                         return "menu"
@@ -466,56 +423,13 @@ class Code_Ai:
                         end = self.menu_endgame()
                         if end == "menu":
                             return "menu"
-                        """
-                        label = myfont.render("YOU lost!!", 1, black)
                         
-                        pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                        self.screen.blit(label, (40,10))
-                        self.screen.blit(self.reset_picture,(self.button_reset))
-                        pygame.display.update()
-                        self.game_over = True
-                        pygame.time.wait(1000)
-                        waiting_for_input = True
-                        while waiting_for_input:
-                            for evt in pygame.event.get():
-                                if evt.type == pygame.QUIT:
-                                    pygame.quit()
-                                    sys.exit()
-                                if evt.type == pygame.MOUSEBUTTONDOWN:
-                                    if self.button_reset.collidepoint(evt.pos):
-                                        self.restart_board()
-                                        waiting_for_input = False
-                                        break 
-                                    else:
-                                        return "menu"
-                                        """
-
-
                     if self.izenaceno():
                         end = self.menu_endgame()
                         if end == "menu":
                             return "menu"
-                        """label = myfont.render("DRAW!",1,black)
-                        pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
-                        self.screen.blit(self.reset_picture,(self.button_reset))
-                        self.screen.blit(label, (40,10))
-                        pygame.display.update()
-                        self.game_over = True
-                        pygame.time.wait(1000)
-                        waiting_for_input = True
-                        while waiting_for_input:
-                            for evt in pygame.event.get():
-                                if evt.type == pygame.QUIT:
-                                    pygame.quit()
-                                    sys.exit()
-                                if evt.type == pygame.MOUSEBUTTONDOWN:
-                                    if self.button_reset.collidepoint(evt.pos):
-                                        self.restart_board()
-                                        waiting_for_input = False
-                                        break
-                                    else:
-                                        return "menu"
-                                        """
+                        
+                                        
                         
                 pygame.display.update()
     

@@ -3,7 +3,7 @@ import sys
 import numpy as np
 
 pygame.init()
-
+pygame.mixer.init()
 #barve
 white = (255,255,255)
 green = (0,255,0)
@@ -26,14 +26,19 @@ class GameMenu:
         #ozadje
         self.connect4_title = pygame.image.load("github 4 in a row/slike/title_4.gif")
         self.background = pygame.image.load("github 4 in a row/slike/background.jpg")
-        self.background = pygame.transform.scale(self.background, (width,height))  # Prilagodi velikost
+        self.background = pygame.transform.scale(self.background, (width,height)) 
         #gumbi za izbor načina igre
         self.button1v1 = pygame.Rect((width / 2)-(width*0.35)/2 ,(height / 2)-(height*0.05)/2,width*0.4,height*0.1)
         self.buttonAi = pygame.Rect((width / 2)-(width*0.35)/2 ,(height / 2)-(height*0.3)/2,width*0.4,height*0.1)
         #self.buttonAi = pygame.Rect()
         self.game_mode = None  # način igre dam na None
-    
-    #za ozadje
+        self.menu_music()  
+
+    def menu_music(self):
+        pygame.mixer.music.load("github 4 in a row/sounds/intro.mp3")
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
+
     def set_background(self):
         self.screen.blit(self.background,(0,0))
 

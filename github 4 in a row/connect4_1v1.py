@@ -4,7 +4,6 @@ import numpy as np
 from menu import width, height, red, green, black, white,yellow
 
 pygame.init()
-
 pygame.mixer.init()
 blue = (0,0,255)
 stolpci = 7  #stolpci
@@ -118,16 +117,23 @@ class Code_1v1:
 
         resume_button = pygame.Rect(width//2 - 200, height//2 - 50, 400, 60)
         menu_button = pygame.Rect(width//2 - 200, height//2 + 50, 400, 60)
-        
+        restart_button = pygame.Rect(width//2 - 200, height//2 + 150, 400, 60)
+
+
         font = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf", 30)
         resume_text = font.render("RESUME GAME", True, white)
         quit_text = font.render("QUIT TO MENU", True, white)
+        restart_text = font.render("RESTART GAME", True, white)
+        pygame.draw.rect(self.screen, black, restart_button, border_radius=10)
         pygame.draw.rect(self.screen, black, resume_button, border_radius=10)
         pygame.draw.rect(self.screen, black, menu_button, border_radius=10)
+
+        self.screen.blit(restart_text,(restart_button.x  + (restart_button.width - restart_text.get_width())//2,
+            restart_button.y + (restart_button.height - restart_text.get_height())//2))
         self.screen.blit(resume_text, (resume_button.x + (resume_button.width - resume_text.get_width())//2,
-                                resume_button.y + (resume_button.height - resume_text.get_height())//2))
+            resume_button.y + (resume_button.height - resume_text.get_height())//2))
         self.screen.blit(quit_text, (menu_button.x + (menu_button.width - quit_text.get_width())//2, 
-                            menu_button.y + (menu_button.height - quit_text.get_height())//2))
+            menu_button.y + (menu_button.height - quit_text.get_height())//2))
         
         pygame.display.update()
         waiting_for_input = True
@@ -137,6 +143,9 @@ class Code_1v1:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    if restart_button.collidepoint(event.pos):
+                        waiting_for_input = False
+                        self.restart_board()
                     if resume_button.collidepoint(event.pos):
                         waiting_for_input = False
                         self.screen.fill(white)

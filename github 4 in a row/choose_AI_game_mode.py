@@ -1,7 +1,8 @@
 import pygame
 import sys
 from menu import width, height, red, green, black, white,yellow
-
+pygame.init()
+pygame.mixer.init()
 
 class AI_difficulty:
     def __init__(self):
@@ -17,7 +18,13 @@ class AI_difficulty:
         self.button_easy = pygame.Rect((width)-(width*0.75) ,(height / 2)-(height*0.3)/2,width*0.2,height*0.1)
         self.button_hard = pygame.Rect((width)-(width*0.45) ,(height / 2)-(height*0.3)/2,width*0.2,height*0.1)
         self.game_mode = None  # način igre dam na None
-    
+        #self.menu_music()
+   
+    def menu_music(self):
+        pygame.mixer.music.load("github 4 in a row/sounds/intro.mp3")
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
+
     #za ozadje
     def set_background(self):
         self.screen.blit(self.background,(0,0))
