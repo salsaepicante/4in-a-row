@@ -173,9 +173,9 @@ class Code_1v1:
         font = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf", 30)
         resume_text = font.render("RESTART GAME", True, white)
         quit_text = font.render("QUIT TO MENU", True, white)
-        if self.wining_move(2):
+        if self.wining_move(1):
             win_text = font.render("RED PLAYER WINS",True, red)
-        elif self.wining_move(1):
+        elif self.wining_move(2):
             win_text = font.render("YELLOW PLAYER WINS", True, yellow)
         else:
             win_text = font.render("DRAW",True,black)
