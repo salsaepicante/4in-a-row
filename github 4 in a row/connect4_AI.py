@@ -143,7 +143,7 @@ class Code_Ai:
         if piece == self.turn_ME:
             self.opponent_piece = self.turn_AI
         if window.count(piece) == 4:
-            score += 200
+            score += 100
         elif window.count(piece) == 3 and window.count(0) == 1:
             score += 5
         elif window.count(piece) == 2 and window.count(0) == 2:
