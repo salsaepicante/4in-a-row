@@ -24,12 +24,13 @@ class GameMenu:
         self.screen = pygame.display.set_mode((width,height))
 
         #ozadje
-        self.connect4_title = pygame.image.load("github 4 in a row/slike/title_4.gif")
+        self.connect4_title = pygame.image.load("github 4 in a row/slike/title_4.png")
+        self.connect4_title = pygame.transform.scale(self.connect4_title, (width * 0.5,height * 0.5))
         self.background = pygame.image.load("github 4 in a row/slike/background.jpg")
         self.background = pygame.transform.scale(self.background, (width,height)) 
         #gumbi za izbor načina igre
-        self.button1v1 = pygame.Rect((width / 2)-(width*0.35)/2 ,(height / 2)-(height*0.05)/2,width*0.4,height*0.1)
-        self.buttonAi = pygame.Rect((width / 2)-(width*0.35)/2 ,(height / 2)-(height*0.3)/2,width*0.4,height*0.1)
+        self.button1v1 = pygame.Rect((width / 2)-(width*0.4)/2 ,(height)-(height*0.3),width*0.4,height*0.1)
+        self.buttonAi = pygame.Rect((width / 2)-(width*0.4)/2 ,(height)-(height*0.45),width*0.4,height*0.1)
         #self.buttonAi = pygame.Rect()
         self.game_mode = None  # način igre dam na None
         self.menu_music()  
@@ -50,9 +51,9 @@ class GameMenu:
         #pygame.draw.rect(self.screen,black,self.buttonAi)
         self.text_1v1 = self.font.render("2 players",True,white)
         self.text_Ai = self.font.render("Versus Ai",True,white)
-        self.screen.blit(self.connect4_title,(width/2 - self.connect4_title.get_width()/2, 50))
-        self.screen.blit(self.text_1v1, (self.button1v1.x , self.button1v1.y  + 15))
-        self.screen.blit(self.text_Ai, (self.buttonAi.x , self.buttonAi.y  + 15))
+        self.screen.blit(self.connect4_title,(width/2 - self.connect4_title.get_width()/2, 20))
+        self.screen.blit(self.text_1v1, (self.button1v1.x  + 15 , self.button1v1.y  + 15))
+        self.screen.blit(self.text_Ai, (self.buttonAi.x  + 15, self.buttonAi.y  + 15))
     
 
 
