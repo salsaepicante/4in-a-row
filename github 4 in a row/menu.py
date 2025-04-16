@@ -11,6 +11,7 @@ red = (255,0,0)
 black = (0,0,0)
 yellow = (255,255,0)
 dark_blue = (0, 0, 190)
+
 #dimenzije
 
 height, width = 700, 700
