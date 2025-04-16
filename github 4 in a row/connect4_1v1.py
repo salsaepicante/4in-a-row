@@ -11,6 +11,7 @@ vrstice = 6 #vrstice
 velikost_kvadrata = 100
 dark_blue = (0, 0, 190)
 light_grey = (220,235,250)
+dark_blue2 = (0, 0, 220)
 
 class Code_1v1:
     def __init__(self):
