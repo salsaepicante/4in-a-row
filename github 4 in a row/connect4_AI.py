@@ -3,22 +3,26 @@ import pygame
 import numpy as np
 from random import randint,random
 import random
-from menu import width, height, red, green, black, white,yellow
+from menu import width, height, red, green, black, white,yellow,dark_blue
 
 pygame.init()
 pygame.mixer.init()
 blue = (0,0,255)
+
 stolpci = 7  #stolpci
 vrstice = 6 #vrstice
 velikost_kvadrata = 100
-
-difficulty = None
+light_grey = (220,235,250)
+difficulty = 4
 
 class Code_Ai:
     def __init__(self,difficulty):
-        pygame.display.set_caption("Connect 4:  AI")
+        if difficulty == 2:
+            pygame.display.set_caption("Connect 4:  AI easy")
+        elif difficulty == 5:
+            pygame.display.set_caption("Connect 4:  AI hard")
         self.screen = pygame.display.set_mode((width,height))
-        self.screen.fill(white)
+        self.screen.fill(light_grey)
         self.board = np.zeros((vrstice,stolpci))
         #self.board= [[0]* stolpci for i in range(vrstice)]
         self.game_over = False
@@ -73,7 +77,8 @@ class Code_Ai:
         for stolpec in range(stolpci):
             for vrstica in range(1,vrstice +1):
                     pygame.draw.rect(self.screen,blue,(stolpec * velikost_kvadrata,vrstica * velikost_kvadrata,velikost_kvadrata,velikost_kvadrata))
-                    pygame.draw.circle(self.screen,white,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
+                    pygame.draw.circle(self.screen,light_grey,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
+                    pygame.draw.circle(self.screen,dark_blue,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5) + 3, 5)
         pygame.time.wait(500)
     def wining_move(self,board,piece):
            
@@ -247,6 +252,16 @@ class Code_Ai:
                     break
             return column, value
 
+
+    def redraw_board(self):
+        self.draw_board()
+        for i in range(vrstice):
+            for j in range(stolpci):
+                if self.board[i][j] == 1:
+                    pygame.draw.circle(self.screen, red, (j * velikost_kvadrata + int(velikost_kvadrata/2), (vrstice - i) * velikost_kvadrata + int(velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
+                elif self.board[i][j] == 2:
+                    pygame.draw.circle(self.screen, yellow, (j * velikost_kvadrata + int(velikost_kvadrata/2), (vrstice - i) * velikost_kvadrata + int(velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
+        pygame.display.update()
     
     def escape_menu(self):
         self.overlay = pygame.Surface((width, height))
@@ -287,14 +302,7 @@ class Code_Ai:
                     if resume_button.collidepoint(event.pos):
                         waiting_for_input = False
                         self.screen.fill(white)
-                        self.draw_board()
-                        for i in range(vrstice):
-                            for j in range(stolpci):
-                                if self.board[i][j] == 1:
-                                    pygame.draw.circle(self.screen, red, (j * velikost_kvadrata + int(velikost_kvadrata/2), (vrstice - i) * velikost_kvadrata + int(velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
-                                elif self.board[i][j] == 2:
-                                    pygame.draw.circle(self.screen, yellow, (j * velikost_kvadrata + int(velikost_kvadrata/2), (vrstice - i) * velikost_kvadrata + int(velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
-                        pygame.display.update()
+                        self.redraw_board()
                     elif menu_button.collidepoint(event.pos):
                         return "menu" 
                 
@@ -352,6 +360,7 @@ class Code_Ai:
         myfont = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf", 40)
         self.button_again = pygame.Rect(width//2-100, height//2, 200, 50)
         stolpec = 0
+
         while not self.game_over:
             for event in pygame.event.get():
                
@@ -367,7 +376,7 @@ class Code_Ai:
                     posx = event.pos[0]
                     
                     stolpec = min(posx // velikost_kvadrata, stolpci - 1)
-                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
+                    pygame.draw.rect(self.screen,light_grey,(0,0,width,velikost_kvadrata))
                     pygame.draw.circle(self.screen,red,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2), int(velikost_kvadrata/2)),
                                     int(velikost_kvadrata/2 - 5))
                     pygame.display.update()
@@ -382,6 +391,8 @@ class Code_Ai:
                                 self.drop_piece(vrstica,stolpec,1)
                                 pygame.draw.circle(self.screen,red,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))  
                                 self.turn = self.turn_AI
+                                
+
                                 if self.wining_move(self.board,self.turn_ME):
                                     # Play winning sound
                                     try:
@@ -399,6 +410,10 @@ class Code_Ai:
                 pygame.display.update()
             if self.turn == self.turn_AI:
                 pygame.time.wait(500)
+                try:
+                    pygame.draw.circle(self.screen,yellow,(self.ai_stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - self.ai_vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5),)
+                except:
+                    pass
 
                 if self.search_depth == 5:
                     stolpec,tocke = self.minimax(self.board,self.search_depth, -np.inf, np.inf, True)
@@ -410,9 +425,12 @@ class Code_Ai:
 
                 if self.is_valid_location(self.board,stolpec):
                     vrstica = self.naslednja_prosta_vrstica(self.board, stolpec)    
-
                     self.drop_piece(vrstica,stolpec,self.turn_AI)
-                    pygame.draw.circle(self.screen,yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5))
+                    self.ai_vrstica = vrstica
+                    self.ai_stolpec = stolpec
+                    pygame.draw.circle(self.screen,yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5),)
+                    pygame.draw.circle(self.screen,black,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5),5)
+                    
                     self.turn = self.turn_ME
                     
                     if self.wining_move(self.board,self.turn_AI):

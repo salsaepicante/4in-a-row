@@ -1,7 +1,7 @@
 import sys
 import pygame
 import numpy as np
-from menu import width, height, red, green, black, white,yellow
+from menu import width, height, red, green, black, white,yellow,dark_blue
 
 pygame.init()
 pygame.mixer.init()
@@ -9,13 +9,14 @@ blue = (0,0,255)
 stolpci = 7  #stolpci
 vrstice = 6 #vrstice
 velikost_kvadrata = 100
-
+dark_blue = (0, 0, 190)
+light_grey = (220,235,250)
 
 class Code_1v1:
     def __init__(self):
         pygame.display.set_caption("Connect 4:  1v1")
         self.screen = pygame.display.set_mode((width,height))
-        self.screen.fill(white)
+        self.screen.fill(light_grey)
         self.board = np.zeros((vrstice,stolpci))
         #self.board= [[0]* stolpci for i in range(vrstice)]
         self.game_over = False
@@ -62,7 +63,8 @@ class Code_1v1:
         for stolpec in range(stolpci):
             for vrstica in range(1,vrstice +1):
                     pygame.draw.rect(self.screen,blue,(stolpec * velikost_kvadrata,vrstica * velikost_kvadrata,velikost_kvadrata,velikost_kvadrata))
-                    pygame.draw.circle(self.screen,white,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
+                    pygame.draw.circle(self.screen,dark_blue,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5) + 3, 5)
+                    pygame.draw.circle(self.screen,light_grey,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
 
     def wining_move(self,piece):
            
@@ -109,6 +111,16 @@ class Code_1v1:
         return True
 
 
+    def redraw_board(self):
+        self.draw_board()
+        for i in range(vrstice):
+            for j in range(stolpci):
+                if self.board[i][j] == 1:
+                    pygame.draw.circle(self.screen, red, (j * velikost_kvadrata + int(velikost_kvadrata/2), (vrstice - i) * velikost_kvadrata + int(velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
+                elif self.board[i][j] == 2:
+                    pygame.draw.circle(self.screen, yellow, (j * velikost_kvadrata + int(velikost_kvadrata/2), (vrstice - i) * velikost_kvadrata + int(velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
+        pygame.display.update()
+
     def escape_menu(self):
         self.overlay = pygame.Surface((width, height))
         self.overlay.fill((0, 0, 0))  # Black overlay
@@ -149,14 +161,7 @@ class Code_1v1:
                     if resume_button.collidepoint(event.pos):
                         waiting_for_input = False
                         self.screen.fill(white)
-                        self.draw_board()
-                        for i in range(vrstice):
-                            for j in range(stolpci):
-                                if self.board[i][j] == 1:
-                                    pygame.draw.circle(self.screen, red, (j * velikost_kvadrata + int(velikost_kvadrata/2), (vrstice - i) * velikost_kvadrata + int(velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
-                                elif self.board[i][j] == 2:
-                                    pygame.draw.circle(self.screen, yellow, (j * velikost_kvadrata + int(velikost_kvadrata/2), (vrstice - i) * velikost_kvadrata + int(velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
-                        pygame.display.update()
+                        self.redraw_board()
                     elif menu_button.collidepoint(event.pos):
                         return "menu" 
                     
@@ -225,7 +230,7 @@ class Code_1v1:
                 if event.type == pygame.MOUSEMOTION:
                     posx = event.pos[0]
                     stolpec = min(posx // velikost_kvadrata, stolpci - 1)
-                    pygame.draw.rect(self.screen,white,(0,0,width,velikost_kvadrata))
+                    pygame.draw.rect(self.screen,light_grey,(0,0,width,velikost_kvadrata))
                     pygame.draw.circle(self.screen,red if self.turn == 0 else yellow,
                                       (stolpec * velikost_kvadrata + int(velikost_kvadrata/2), int(velikost_kvadrata/2)),
                                       int(velikost_kvadrata/2 - 5))
