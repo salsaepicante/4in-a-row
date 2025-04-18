@@ -32,6 +32,10 @@ class Code_Ai:
         self.reset_picture = pygame.image.load("github 4 in a row/slike/reset.png")
         self.reset_picture = pygame.transform.scale(self.reset_picture, (100, 100))
         self.search_depth = difficulty
+
+        self.ai_stolpec = None
+        self.ai_vrstica = None
+        self.turns = False
         
         self.load_sounds()
         self.play_background_music()
@@ -114,6 +118,9 @@ class Code_Ai:
         self.turn = randint(self.turn_ME,self.turn_AI)
         self.screen.fill(white)
         self.draw_board()
+        self.ai_stolpec = None
+        self.ai_vrstica = None
+        self.turns = False
         pygame.display.update()
         self.play_background_music()
 
@@ -410,10 +417,11 @@ class Code_Ai:
                 pygame.display.update()
             if self.turn == self.turn_AI:
                 pygame.time.wait(500)
-                try:
-                    pygame.draw.circle(self.screen,yellow,(self.ai_stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - self.ai_vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5),)
-                except:
-                    pass
+                if self.turns and self.ai_stolpec != None and self.ai_vrstica != None:
+                    try:
+                        pygame.draw.circle(self.screen,yellow,(self.ai_stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - self.ai_vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5),)
+                    except:
+                        pass
 
                 if self.search_depth == 5:
                     stolpec,tocke = self.minimax(self.board,self.search_depth, -np.inf, np.inf, True)
@@ -430,7 +438,7 @@ class Code_Ai:
                     self.ai_stolpec = stolpec
                     pygame.draw.circle(self.screen,yellow,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5),)
                     pygame.draw.circle(self.screen,black,(stolpec * velikost_kvadrata + int(velikost_kvadrata/2),(vrstice  - vrstica) * velikost_kvadrata + int(velikost_kvadrata/2)),int(velikost_kvadrata/2 - 5),5)
-                    
+                    self.turns = True
                     self.turn = self.turn_ME
                     
                     if self.wining_move(self.board,self.turn_AI):
@@ -446,6 +454,8 @@ class Code_Ai:
                         end = self.menu_endgame()
                         if end == "menu":
                             return "menu"
+                    
+                    
                         
                                         
                         
