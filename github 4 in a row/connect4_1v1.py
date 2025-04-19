@@ -3,6 +3,9 @@ import pygame
 import numpy as np
 from menu import width, height, red, green, black, white,yellow,dark_blue
 
+
+#pomagal z tutorialom, le da sem jaz delal z objekti
+
 pygame.init()
 pygame.mixer.init()
 blue = (0,0,255)
@@ -64,9 +67,8 @@ class Code_1v1:
         for stolpec in range(stolpci):
             for vrstica in range(1,vrstice +1):
                     pygame.draw.rect(self.screen,blue,(stolpec * velikost_kvadrata,vrstica * velikost_kvadrata,velikost_kvadrata,velikost_kvadrata))
-                    pygame.draw.circle(self.screen,dark_blue,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5) + 3, 5)
                     pygame.draw.circle(self.screen,light_grey,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5))
-
+                    pygame.draw.circle(self.screen,dark_blue,(int(stolpec *  velikost_kvadrata + velikost_kvadrata/2), int(vrstica * velikost_kvadrata  + velikost_kvadrata/2)), int(velikost_kvadrata/2 - 5) + 3, 5)
     def wining_move(self,piece):
            
         # Horizontala

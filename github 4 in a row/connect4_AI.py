@@ -9,6 +9,8 @@ pygame.init()
 pygame.mixer.init()
 blue = (0,0,255)
 
+#pomagal z tutorialom, le da sem jaz delal z objekti
+
 stolpci = 7  #stolpci
 vrstice = 6 #vrstice
 velikost_kvadrata = 100
@@ -195,7 +197,7 @@ class Code_Ai:
                 
         return score
     #not used
-    def pick_best_move(self,piece):
+    def pick_best_move(self,piece): #POMAGAL Z TUTORIALOM LE DA SEM SPREMENIL NEKAJ STVARI SAJ  DELAM Z OBJEKTNIM PROGRAMIRANJEM
 
         self.valid_locations = self.get_valid_locations(self.board)
         self.best_score = -10000
@@ -214,7 +216,7 @@ class Code_Ai:
     def is_terminal_node(self, board):
         return self.wining_move(board, self.turn_ME) or self.wining_move(board, self.turn_AI) or len(self.get_valid_locations(board)) == 0
     
-    def minimax(self,board, depth, alpha, beta, maximizingPlayer):
+    def minimax(self,board, depth, alpha, beta, maximizingPlayer): #POMAGAL Z TUTORIALOM LE DA SEM SPREMENIL NEKAJ STVARI SAJ  DELAM Z OBJEKTNIM PROGRAMIRANJEM
         valid_locations = self.get_valid_locations(board)
         is_terminal = self.is_terminal_node(board)
         if depth == 0 or is_terminal:

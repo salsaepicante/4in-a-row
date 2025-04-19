@@ -11,13 +11,11 @@ class AI_difficulty:
         self.font = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf",30)
         self.screen = pygame.display.set_mode((width,height))
 
-        #ozadje
         self.background = pygame.image.load("github 4 in a row/slike/background.jpg")
         self.background = pygame.transform.scale(self.background, (width,height)) 
-        #gumbi za izbor načina igre
         self.button_easy = pygame.Rect((width)-(width*0.75) ,(height / 2)-(height*0.3)/2,width*0.2,height*0.1)
         self.button_hard = pygame.Rect((width)-(width*0.45) ,(height / 2)-(height*0.3)/2,width*0.2,height*0.1)
-        self.game_mode = None  # način igre dam na None
+        self.game_mode = None 
         #self.menu_music()
    
     def menu_music(self):

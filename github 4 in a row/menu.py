@@ -25,16 +25,16 @@ class GameMenu:
         self.font = pygame.font.Font("github 4 in a row/fonts/arcade_font.ttf",30)
         self.screen = pygame.display.set_mode((width,height))
 
-        #ozadje
+        
         self.connect4_title = pygame.image.load("github 4 in a row/slike/title_4.png")
         self.connect4_title = pygame.transform.scale(self.connect4_title, (width * 0.5,height * 0.5))
         self.background = pygame.image.load("github 4 in a row/slike/background.jpg")
         self.background = pygame.transform.scale(self.background, (width,height)) 
-        #gumbi za izbor načina igre
+     
         self.button1v1 = pygame.Rect((width / 2)-(width*0.4)/2 ,(height)-(height*0.3),width*0.4,height*0.1)
         self.buttonAi = pygame.Rect((width / 2)-(width*0.4)/2 ,(height)-(height*0.45),width*0.4,height*0.1)
         #self.buttonAi = pygame.Rect()
-        self.game_mode = None  # način igre dam na None
+        self.game_mode = None 
         self.menu_music()  
 
     def menu_music(self):
@@ -46,7 +46,6 @@ class GameMenu:
         self.screen.blit(self.background,(0,0))
 
 
-    #narišem gumbe in besedilo na zaslon
     def buttons(self):
         
         #pygame.draw.rect(self.screen,black,self.button1v1)
